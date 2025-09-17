@@ -671,7 +671,7 @@ Rem Установка синих папок
 Rem Установка Icaros
 	if not exist "%ProgramFiles%\WinClean\Preview" mkdir "%ProgramFiles%\WinClean\Preview" >nul 2>&1
     for %%F in (avcodec-ics-61.dll avformat-ics-61.dll avutil-ics-59.dll IcarosCache.dll IcarosPropertyHandler.dll IcarosThumbnailProvider.dll libunarr-ics.dll swscale-ics-8.dll) do (
-	move "%~dp0\Work\Icaros\%%F" "%ProgramFiles%\WinClean\Preview" >nul 2>&1) 
+	copy "%~dp0\Work\Icaros\%%F" "%ProgramFiles%\WinClean\Preview" >nul 2>&1) 
 
     reg add "HKLM\SOFTWARE\Classes\CLSID\{c5aec3ec-e812-4677-a9a7-4fee1f9aa000}" /ve /t REG_SZ /d "Icaros Thumbnail Provider" /f >nul
     reg add "HKLM\SOFTWARE\Classes\CLSID\{c5aec3ec-e812-4677-a9a7-4fee1f9aa000}\InProcServer32" /ve /t REG_SZ /d "%ProgramFiles%\WinClean\Preview\IcarosThumbnailProvider.dll" /f >nul
