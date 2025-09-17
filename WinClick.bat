@@ -719,7 +719,7 @@ Rem Открывать Проводник в Этот компьютер
 
 
 echo Сжатие системы... [13/13] > "%msgFile%"
-rem compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
+	compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 	pushd "%LocalAppData%\Microsoft\Windows\Explorer" >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	del /s /q /f "IconCache*" "thumbcache*" >nul 2>&1
