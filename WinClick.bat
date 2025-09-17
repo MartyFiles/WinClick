@@ -728,6 +728,8 @@ rem compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 	if exist IconCache.db-wal del /a /q IconCache.db-wal >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	popd >nul 2>&1
+
+
 echo Готово. Перезагружаюсь...> "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
 	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
