@@ -4,12 +4,12 @@
 	Title WinClick by MartyFiles
 	Color 0f
 	chcp 866 >nul
-	echo "%~dp0\Work" | findstr /r "[()!]" >nul && echo ãâì ¤® .bat á®¤¥à¦¨â ­¥¤®¯ãáâ¨¬ë¥ á¨¬¢®«ë. && timeout /t 7 >nul && exit
+	echo "%~dp0\Work" | findstr /r "[()!]" >nul && echo ÐŸÑƒÑ‚ÑŒ Ð´Ð¾ .bat ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð½ÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ðµ ÑÐ¸Ð¼Ð²Ð¾Ð»Ñ‹. && timeout /t 7 >nul && exit
 	SetLocal EnableDelayedExpansion
 	cd /d "%~dp0\Work"
 	reg query "HKU\S-1-5-19" >nul 2>&1 || nircmd elevate "%~f0" && exit
 
-Rem “áâ ­®¢ª  ¯¥à¥¬¥­­ëå
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ñ…
 	set "ch=cecho.exe"
 	set "TI=NSudoLG -U:T -P:E -ShowWindowMode:Hide -Wait cmd.exe /c"
 	mode 55,10 >nul
@@ -17,18 +17,18 @@ Rem “áâ ­®¢ª  ¯¥à¥¬¥­­ëå
 	set msgFile=%~dp0Work\message.txt
 	
 
-Rem ”¨ªá, ¥á«¨ § ¯ãé¥­® ¨§ Terminal UWP
+Rem Ð¤Ð¸ÐºÑ, ÐµÑÐ»Ð¸ Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾ Ð¸Ð· Terminal UWP
 	tasklist /fi "imagename eq WindowsTerminal.exe" 2>nul | find /i "WindowsTerminal" >nul && (
 		for %%p in (DelegationConsole DelegationTerminal) do reg add "HKCU\Console\%%%%Startup" /v "%%p" /t REG_SZ /d "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" /f >nul
 		echo. && echo  Restarting with cmd .. && timeout /t 3 /nobreak >nul && start "" "%~f0" && exit
 	)
-Rem à®¢¥àª  ¢¥àá¨¨
+Rem ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð²ÐµÑ€ÑÐ¸Ð¸
 	call :WinVer && exit /b
 	start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
-	echo ‘ª®à® Windows 11 áâ ­¥â «ãçè¥ > "%msgFile%"
+	echo Ð¡ÐºÐ¾Ñ€Ð¾ Windows 11 ÑÑ‚Ð°Ð½ÐµÑ‚ Ð»ÑƒÑ‡ÑˆÐµ > "%msgFile%"
 	timeout /t 4 /nobreak >nul 2>&1
 
-echo “¤ «¥­¨¥ ¬ãá®à ... [1/13]  > "%msgFile%"
+echo Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¼ÑƒÑÐ¾Ñ€Ð°... [1/13]  > "%msgFile%"
 	sc query wuauserv | find /i "RUNNING" >nul 2>&1 && (
 		net stop wuauserv >nul 2>&1
 		timeout /t 1 /nobreak >nul 2>&1
@@ -50,13 +50,13 @@ echo “¤ «¥­¨¥ ¬ãá®à ... [1/13]  > "%msgFile%"
 	if exist IconCache.db-wal del /a /q IconCache.db-wal >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	popd
-Rem Žç¨áâª  WinSxS
+Rem ÐžÑ‡Ð¸ÑÑ‚ÐºÐ° WinSxS
 	Dism /online /Cleanup-Image /StartComponentCleanup /ResetBase >nul 2>&1
-Rem “¤ «¥­¨ï áâ àëå ¤à ©¢¥à®¢
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ€Ñ‹Ñ… Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð¾Ð²
 PowerShell -encodedCommand JABkAGkAcwBtAE8AdQB0ACAAPQAgAGQAaQBzAG0AIAAvAG8AbgBsAGkAbgBlACAALwBnAGUAdAAtAGQAcgBpAHYAZQByAHMADQAKACQATABpAG4AZQBzACAAPQAgACQAZABpAHMAbQBPAHUAdAAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEAMAANAAoAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAiAHQAaABlAE4AYQBtAGUAIgANAAoAJABEAHIAaQB2AGUAcgBzACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQATABpAG4AZQAgAGkAbgAgACQATABpAG4AZQBzACAAKQAgAHsADQAKACAAIAAgACAAJAB0AG0AcAAgAD0AIAAkAEwAaQBuAGUADQAKACAAIAAgACAAJAB0AHgAdAAgAD0AIAAkACgAJAB0AG0AcAAuAFMAcABsAGkAdAAoACAAJwA6ACcAIAApACkAWwAxAF0ADQAKACAAIAAgACAAcwB3AGkAdABjAGgAIAAoACQATwBwAGUAcgBhAHQAaQBvAG4AKQAgAHsADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AYQBtAGUAJwAgAHsAIAAkAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEYAaQBsAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARgBpAGwAZQBOAGEAbQBlACcAIAB7ACAAJABGAGkAbABlAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBFAG4AdAByACcADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARQBuAHQAcgAnACAAewAgACQARQBuAHQAcgAgAD0AIAAkAHQAeAB0AC4AVAByAGkAbQAoACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBDAGwAYQBzAHMATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUAQwBsAGEAcwBzAE4AYQBtAGUAJwAgAHsAIAAkAEMAbABhAHMAcwBOAGEAbQBlACAAPQAgACQAdAB4AHQALgBUAHIAaQBtACgAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnACAAewAgACQAVgBlAG4AZABvAHIAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEQAYQB0AGUAJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARABhAHQAZQAnACAAewAgACAAJAB0AG0AcAAgAD0AIAAkAHQAeAB0AC4AcwBwAGwAaQB0ACgAIAAnAC4AJwAgACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAdAB4AHQAIAA9ACAAIgAkACgAJAB0AG0AcABbADIAXQApAC4AJAAoACQAdABtAHAAWwAxAF0AKQAuACQAKAAkAHQAbQBwAFsAMABdAC4AVAByAGkAbQAoACkAKQAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAEQAYQB0AGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwAgAHsAIAAkAFYAZQByAHMAaQBvAG4AIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgB1AGwAbAAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAHAAYQByAGEAbQBzACAAPQAgAFsAbwByAGQAZQByAGUAZABdAEAAewAgACcARgBpAGwAZQBOAGEAbQBlACcAIAA9ACAAJABGAGkAbABlAE4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBWAGUAbgBkAG8AcgAnACAAPQAgACQAVgBlAG4AZABvAHIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBEAGEAdABlACcAIAA9ACAAJABEAGEAdABlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACcATgBhAG0AZQAnACAAPQAgACQATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAEMAbABhAHMAcwBOAGEAbQBlACcAIAA9ACAAJABDAGwAYQBzAHMATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAFYAZQByAHMAaQBvAG4AJwAgAD0AIAAkAFYAZQByAHMAaQBvAG4ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBFAG4AdAByACcAIAA9ACAAJABFAG4AdAByAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABvAGIAagAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBUAHkAcABlAE4AYQBtAGUAIABQAFMATwBiAGoAZQBjAHQAIAAtAFAAcgBvAHAAZQByAHQAeQAgACQAcABhAHIAYQBtAHMADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQARAByAGkAdgBlAHIAcwAgACsAPQAgACQAbwBiAGoADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AdQBsAGwAJwAgAHsAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAGwAYQBzAHQAIAA9ACAAJwAnAA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJAAoACQARAByAGkAdgBlAHIAcwAgAHwAIABzAG8AcgB0ACAARgBpAGwAZQBuAGEAbQBlACkAIAApACAAewANAAoAIAAgACAAIABpAGYAIAAoACQARAByAC4ARgBpAGwAZQBOAGEAbQBlACAALQBlAHEAIAAkAGwAYQBzAHQAIAAgACkAIAB7ACAAIAAkAE4AbwB0AFUAbgBpAHEAdQBlACAAKwA9ACAAJABEAHIAIAAgAH0ADQAKACAAIAAgACAAJABsAGEAcwB0ACAAPQAgACQARAByAC4ARgBpAGwAZQBOAGEAbQBlAA0ACgB9AA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAfAAgAHMAbwByAHQAIABGAGkAbABlAE4AYQBtAGUAIAB8ACAAZgB0AA0ACgAjAFMAZQBhAHIAYwBoAGkAbgBnACAAZgBvAHIAIABkAHUAcABsAGkAYwBhAHQAZQAgAGQAcgBpAHYAZQByAHMAIAANAAoAJABsAGkAcwB0ACAAPQAgACQATgBvAHQAVQBuAGkAcQB1AGUAIAB8ACAAcwBlAGwAZQBjAHQAIAAtAEUAeABwAGEAbgBkAFAAcgBvAHAAZQByAHQAeQAgAEYAaQBsAGUATgBhAG0AZQAgAC0AVQBuAGkAcQB1AGUADQAKACQAVABvAEQAZQBsACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJABsAGkAcwB0ACAAKQAgAHsADQAKACAAIAAgACAAVwByAGkAdABlAC0ASABvAHMAdAAgACIARAB1AHAAbABpAGMAYQB0AGUAIABkAHIAaQB2AGUAcgAgAGYAbwB1AG4AZAAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgACQAcwBlAGwAIAA9ACAAJABEAHIAaQB2AGUAcgBzACAAfAAgAHcAaABlAHIAZQAgAHsAIAAkAF8ALgBGAGkAbABlAE4AYQBtAGUAIAAtAGUAcQAgACQARAByACAAfQAgAHwAIABzAG8AcgB0ACAAZABhAHQAZQAgAC0ARABlAHMAYwBlAG4AZABpAG4AZwAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEADQAKACAAIAAgACAAJABzAGUAbAAgAHwAIABmAHQADQAKACAAIAAgACAAJABUAG8ARABlAGwAIAArAD0AIAAkAHMAZQBsAA0ACgB9AA0ACgAjAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAEwAaQBzAHQAIABvAGYAIABkAHIAaQB2AGUAcgAgAHYAZQByAHMAaQBvAG4AIAAgAHQAbwAgAHIAZQBtAG8AdgBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAUgBlAGQADQAKACQAVABvAEQAZQBsACAAfAAgAGYAdAANAAoAIwBEAGUAbABlAHQAaQBuAGcAIABvAGwAZAAgAGQAcgBpAHYAZQByAHMADQAKAGYAbwByAGUAYQBjAGgAIAAoACAAJABpAHQAZQBtACAAaQBuACAAJABUAG8ARABlAGwAIAApACAAewANAAoAIAAgACAAIAAkAE4AYQBtAGUAIAA9ACAAJAAoACQAaQB0AGUAbQAuAE4AYQBtAGUAKQAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAGQAZQBsAGUAdABpAG4AZwAgACQATgBhAG0AZQAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAHAAbgBwAHUAdABpAGwALgBlAHgAZQAgAC8AZABlAGwAZQB0AGUALQBkAHIAaQB2AGUAcgAgACAAJABOAGEAbQBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAWQBlAGwAbABvAHcADQAKACAAIAAgACAASQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuACAALQBDAG8AbQBtAGEAbgBkACAAIgBwAG4AcAB1AHQAaQBsAC4AZQB4AGUAIAAvAGQAZQBsAGUAdABlAC0AZAByAGkAdgBlAHIAIAAkAE4AYQBtAGUAIgANAAoAfQA= >nul 2>&1
 
 
-echo “¤ «¥­¨¥ ¢á¥å UWP-¯à¨«®¦¥­¨©... [2/13] > "%msgFile%"
+echo Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… UWP-Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¹... [2/13] > "%msgFile%"
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false } | ForEach-Object { Remove-AppxPackage -Package $_.PackageFullName -AllUsers -ErrorAction SilentlyContinue }" >nul 2>&1
 	taskkill /f /im OneDrive.exe >nul 2>&1
 	%SystemRoot%\System32\OneDriveSetup.exe /uninstall >nul 2>&1
@@ -73,13 +73,13 @@ echo “¤ «¥­¨¥ ¢á¥å UWP-¯à¨«®¦¥­¨©... [2/13] > "%msgFile%"
 	taskkill /f /im mstsc.exe >nul 2>&1
 
 	
-echo “¤ «¥­¨¥ ¡à ã§¥à  Edge... [3/13] > "%msgFile%"
+echo Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð±Ñ€Ð°ÑƒÐ·ÐµÑ€Ð° Edge... [3/13] > "%msgFile%"
 	taskkill /f /im MicrosoftEdge.exe >nul 2>&1
 	taskkill /f /im MicrosoftEdgeUpdate.exe >nul 2>&1
 	start /wait "" "%~dp0\Work\setup.exe" --uninstall --system-level --verbose-logging --force-uninstall --msedge >nul 2>&1
 	start /wait "" "%~dp0\Work\setup.exe" --uninstall --system-level --verbose-logging --force-uninstall --msedgewebview >nul 2>&1
 
-echo “¤ «¥­¨¥ ‡ é¨â­¨ª ... [4/13] > "%msgFile%"
+echo Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð—Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸ÐºÐ°... [4/13] > "%msgFile%"
 	reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" | find /i "0x0" >nul 2>&1 && set "ArgNsudo=C" || set "ArgNsudo=E"
 	set "ListWDServ=WinDefend MDCoreSvc WdNisSvc Sense wscsvc SgrmBroker SecurityHealthService webthreatdefsvc webthreatdefusersvc WdNisDrv WdBoot WdFilter SgrmAgent MsSecWfp MsSecFlt MsSecCore"
 	goto StartProcessRemove
@@ -92,7 +92,7 @@ echo “¤ «¥­¨¥ ‡ é¨â­¨ª ... [4/13] > "%msgFile%"
 	exit /b
 
 :StartProcessRemove
-rem …á«¨ à §¤¥« ¤à ©¢¥à  filter ¨ à §¤¥« wd ®â defender áãé¥áâ¢ãîâ (®¡ ) ¨ ¥á«¨ ­¥ ­ ©¤¥­ ¢ ¨áª«îç¥­¨ïå á¨áâ¥¬­ë© ¤¨áª - ¤®¡ ¢«ï¥¬ ¢ ¨áª«îç¥­¨ï.
+rem Ð•ÑÐ»Ð¸ Ñ€Ð°Ð·Ð´ÐµÐ» Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð° filter Ð¸ Ñ€Ð°Ð·Ð´ÐµÐ» wd Ð¾Ñ‚ defender ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÑŽÑ‚ (Ð¾Ð±Ð°) Ð¸ ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½ Ð² Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸ÑÑ… ÑÐ¸ÑÑ‚ÐµÐ¼Ð½Ñ‹Ð¹ Ð´Ð¸ÑÐº - Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð² Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ.
 	reg query HKLM\System\CurrentControlset\Services\WdFilter >nul 2>&1 && reg query "HKLM\Software\Microsoft\Windows Defender" >nul 2>&1 && (
 		reg query "HKLM\Software\Microsoft\Windows Defender\Exclusions\Paths" | find /i "%SystemDrive%\" >nul 2>&1 || (
 			call :AddExclusionDef
@@ -105,7 +105,7 @@ rem …á«¨ à §¤¥« ¤à ©¢¥à  filter ¨ à §¤¥« wd ®â defender áãé¥áâ¢ãîâ (®¡ ) ¨ ¥á«¨ 
 		)
 	)
 
-rem à®¯ãáª ¥¬ á®§¤ ­¨¥ ª®¯¨¨. …á«¨ ­¥â ¢¥â®ª. …á«¨ ­¥â ä ©« . Œ­®¦¥áâ¢¥­­ ï ¯à®¢¥àª  ­  â®, ¢ë¯®«­ï«®áì «¨ ã¤ «¥­¨¥ å®âï ¡ë 1 à §.
+rem ÐŸÑ€Ð¾Ð¿ÑƒÑÐºÐ°ÐµÐ¼ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¿Ð¸Ð¸. Ð•ÑÐ»Ð¸ Ð½ÐµÑ‚ Ð²ÐµÑ‚Ð¾Ðº. Ð•ÑÐ»Ð¸ Ð½ÐµÑ‚ Ñ„Ð°Ð¹Ð»Ð°. ÐœÐ½Ð¾Ð¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ‚Ð¾, Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»Ð¾ÑÑŒ Ð»Ð¸ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ñ…Ð¾Ñ‚Ñ Ð±Ñ‹ 1 Ñ€Ð°Ð·.
 	set "flag=0"
 	reg query "HKLM\Software\Microsoft\Windows Advanced Threat Protection" >nul 2>&1 && set "flag=1"
 	reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\WINEVT\Channels\Microsoft-Windows-Windows Defender/WHC" >nul 2>&1 && set "flag=1"
@@ -114,14 +114,14 @@ rem à®¯ãáª ¥¬ á®§¤ ­¨¥ ª®¯¨¨. …á«¨ ­¥â ¢¥â®ª. …á«¨ ­¥â ä ©« . Œ­®¦¥áâ¢¥­­ ï ¯à®
 	if not %flag%==1 goto StartUnlockerAndSkipBackup
 
 :StartUnlockerAndSkipBackup
-	Unlocker /D¥lWD
+	Unlocker /DÐµlWD
 	start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
 	taskkill /f /im explorer.exe
 	start explorer
 	for %%d in ("%AllUsersProfile%\Microsoft\Windows Security Health", "%AllUsersProfile%\Microsoft\Windows Defender", "%AllUsersProfile%\Microsoft\Windows Defender", "%AllUsersProfile%\Microsoft\Windows Defender") do (
 		if exist %%d (
 			timeout /t 2 /nobreak >nul
-			Unlocker /D¥lWD
+			Unlocker /DÐµlWD
 			start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
 			taskkill /f /im explorer.exe
 			start explorer
@@ -157,7 +157,7 @@ for %%x in (%ListWDServ%) do (
 	%TI% rd /s /q "%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\Modules\Defender"
 	%TI% rd /s /q "%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\Modules\DefenderPerformance"
 
-rem ¥à¥¨¬¥­®¢ ­¨¥ 4 ä ©«®¢
+rem ÐŸÐµÑ€ÐµÐ¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ 4 Ñ„Ð°Ð¹Ð»Ð¾Ð²
 	%TI% ren "%SystemRoot%\System32\SecurityHealthService.exe" "SecurityHealthService.exe_fuck"
 	%TI% ren "%SystemRoot%\System32\smartscreenps.dll" smartscreenps.dll_fuck
 	%TI% ren "%SystemRoot%\System32\wscapi.dll" wscapi.dll_fuck
@@ -166,7 +166,7 @@ rem ¥à¥¨¬¥­®¢ ­¨¥ 4 ä ©«®¢
 	%TI% del /f /q "%SystemRoot%\Containers\WindowsDefenderApplicationGuard.wim"
 	%TI% del /f /q "%SystemRoot%\Containers\serviced\WindowsDefenderApplicationGuard.wim"
 
-rem “¤ «¥­¨¥ ä ©«®¢ ®â Defender / –¥­âà  ¥§®¯ á­®áâ¨ ¨ SmartScreen + 4 ä ©«  ¯¥à¥¨¬¥­®¢ ­­ëå
+rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð¾Ñ‚ Defender / Ð¦ÐµÐ½Ñ‚Ñ€Ð° Ð‘ÐµÐ·Ð¾Ð¿Ð°ÑÐ½Ð¾ÑÑ‚Ð¸ Ð¸ SmartScreen + 4 Ñ„Ð°Ð¹Ð»Ð° Ð¿ÐµÑ€ÐµÐ¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ…
 	for %%f in (
 		SecurityHealthService.exe SecurityHealthSystray.exe SecurityHealthHost.exe
 		SecurityHealthAgent.dll SecurityHealthSSO.dll SecurityHealthProxyStub.dll smartscreen.dll wscisvif.dll
@@ -176,7 +176,7 @@ rem “¤ «¥­¨¥ ä ©«®¢ ®â Defender / –¥­âà  ¥§®¯ á­®áâ¨ ¨ SmartScreen + 4 ä ©«  ¯¥
 		SecurityHealthService.exe_fuck smartscreenps.dll_fuck wscapi.dll_fuck smartscreen.exedel
 	) do %TI% del /f /q "%SystemRoot%\System32\%%f" "%SystemRoot%\SysWOW64\%%f"
 
-rem « ­¨à®¢é¨ª / ¥¥áâà
+rem ÐŸÐ»Ð°Ð½Ð¸Ñ€Ð¾Ð²Ñ‰Ð¸Ðº / Ð ÐµÐµÑÑ‚Ñ€
 	for %%s in ("Windows Defender Cache Maintenance" "Windows Defender Cleanup" "Windows Defender Scheduled Scan" "Windows Defender Verification"
 	) do %TI% schtasks /Delete /TN "Microsoft\Windows\Windows Defender\%%~s" /f
 	%TI% schtasks /Delete /TN "Microsoft\Windows\AppID\SmartScreenSpecific" /f
@@ -211,28 +211,28 @@ rem « ­¨à®¢é¨ª / ¥¥áâà
 	%TI% reg delete "HKLM\System\CurrentControlSet\Services\WdBoot" /f	
 ) >nul 2>&1
 	sc start VMTools >nul 2>&1
-rem ‘®§¤ ­¨¥ ¢  ¢â®§ ¯ãáª á ¬®¨áç¥§ îé¨å [à §®¢ëå] ª®¬ ­¤ ¤«ï ¯®¤ç¨áâª¨ á«ã¦¡ ¯®á«¥ à¥¡ãâ  Š
+rem Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð² Ð°Ð²Ñ‚Ð¾Ð·Ð°Ð¿ÑƒÑÐº ÑÐ°Ð¼Ð¾Ð¸ÑÑ‡ÐµÐ·Ð°ÑŽÑ‰Ð¸Ñ… [Ñ€Ð°Ð·Ð¾Ð²Ñ‹Ñ…] ÐºÐ¾Ð¼Ð°Ð½Ð´ Ð´Ð»Ñ Ð¿Ð¾Ð´Ñ‡Ð¸ÑÑ‚ÐºÐ¸ ÑÐ»ÑƒÐ¶Ð± Ð¿Ð¾ÑÐ»Ðµ Ñ€ÐµÐ±ÑƒÑ‚Ð° ÐŸÐš
 	reg query "HKLM\System\CurrentControlset\Services\WdFilter" >nul 2>&1 && (
 		call :CreateRunOnceDelReg
 		goto RemoveApps
 	)
-rem ‚®§¢à é ¥¬ æ¢¥â § £®«®¢ª  ¯®-ã¬®«ç ­¨î ¤«ï TI ¯à®£à ¬¬. ¥â ¢ ç¨áâ®© Windows.
+rem Ð’Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÐ¼ Ñ†Ð²ÐµÑ‚ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²ÐºÐ° Ð¿Ð¾-ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ Ð´Ð»Ñ TI Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼. ÐÐµÑ‚ Ð² Ñ‡Ð¸ÑÑ‚Ð¾Ð¹ Windows.
 	reg delete "HKU\S-1-5-18\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /f >nul 2>&1
 	goto RemoveApps
  
  :CreateRunOnceDelReg
 	set "RegKey=HKLM\System\CurrentControlSet\Services"
-rem ®¤ç¨áâª  à¥¥áâà  á ¯®¬®éìî RunOnce ¯®á«¥ à¥¡ãâ  Š
+rem ÐŸÐ¾Ð´Ñ‡Ð¸ÑÑ‚ÐºÐ° Ñ€ÐµÐµÑÑ‚Ñ€Ð° Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒÑŽ RunOnce Ð¿Ð¾ÑÐ»Ðµ Ñ€ÐµÐ±ÑƒÑ‚Ð° ÐŸÐš
 	for %%p in (RegClean RegClean1) do %TI% reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "%%p" /t reg_sz /f /d "\"%~dp0Work\NSudoLG.exe\" -U:T -P:E -ShowWindowMode:Hide -Wait cmd.exe /c \"timeout /t 3 /nobreak ^& reg delete %RegKey%\WdFilter /f ^& reg delete %RegKey%\WinDefend /f ^& reg delete %RegKey%\WdNisDrv /f ^& reg delete %RegKey%\MDCoreSvc /f ^& reg delete %RegKey%\WdNisSvc /f ^& reg delete %RegKey%\WdBoot /f\"" >nul
 	exit /b
 	
 :RemoveApps
 	set "KeyAPPX=SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
-rem “¤ «¨âì ¨§ InboxApplications. —â®¡ ­¥ ãáâ ­®¢¨«áï § ­®¢®. For SystemApps.
+rem Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ Ð¸Ð· InboxApplications. Ð§Ñ‚Ð¾Ð± Ð½Ðµ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ð»ÑÑ Ð·Ð°Ð½Ð¾Ð²Ð¾. For SystemApps.
 	for %%p in (SecHealthUI Apprep.ChxApp) do (
 		for /f "usebackq delims=" %%n In (`2^>nul reg query "HKLM\%KeyAPPX%\InboxApplications" /f "*%%p*" /k^|findstr ^H`) do %TI% reg delete "HKLM\%KeyAPPX%\InboxApplications\%%~nxn" /f >nul 2>&1
 	)
-rem “¤ «¨âì ¨§ Applications ¤«ï Store + EOL + Remove ¤«ï -Allusers + SYS Remove ¤«ï S-1-5-18
+rem Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ Ð¸Ð· Applications Ð´Ð»Ñ Store + EOL + Remove Ð´Ð»Ñ -Allusers + SYS Remove Ð´Ð»Ñ S-1-5-18
 	NSudoLG -U:%ArgNsudo% -ShowWindowMode:Hide -Wait PowerShell "$usrsid = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value; $filters = @('*SecHealthUI*', '*Apprep.ChxApp*'); foreach ($filter in $filters) { $packages = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -like $filter } | Select-Object -ExpandProperty PackageFullName; foreach ($app in $packages) { Remove-Item -Path \"HKLM:\%KeyAPPX%\Applications\$($app)\" -Force -Recurse -ErrorAction SilentlyContinue; $endOfLifePaths = @(\"HKLM:\%KeyAPPX%\EndOfLife\$usrsid\$($app)\", \"HKLM:\%KeyAPPX%\EndOfLife\S-1-5-18\$($app)\"); $endOfLifePaths | ForEach-Object { New-Item -Path $_ -Force | Out-Null }; Remove-AppxPackage -Package $app -AllUsers -ErrorAction SilentlyContinue }}"
 
 	for %%p in (SecHealthUI Apprep.ChxApp) do (
@@ -240,19 +240,19 @@ rem “¤ «¨âì ¨§ Applications ¤«ï Store + EOL + Remove ¤«ï -Allusers + SYS Remove 
 	)
 	%TI% reg delete "HKLM\%KeyAPPX%\EndOfLife" /f >nul 2>&1
 	%TI% reg add "HKLM\%KeyAPPX%\EndOfLife" /f >nul 2>&1
-rem â¨ ¯ ¯ª¨ ¬®¦­® ã¤ «ïâì. ‚®ááâ ­ ¢«¨¢ îâáï á ¬¨, ¥á«¨ ¢®ááâ ­®¢¨âì ¯à¨«®¦¥­¨¥.
+rem Ð­Ñ‚Ð¸ Ð¿Ð°Ð¿ÐºÐ¸ Ð¼Ð¾Ð¶Ð½Ð¾ ÑƒÐ´Ð°Ð»ÑÑ‚ÑŒ. Ð’Ð¾ÑÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÑŽÑ‚ÑÑ ÑÐ°Ð¼Ð¸, ÐµÑÐ»Ð¸ Ð²Ð¾ÑÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ.
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%ProgramData%\Microsoft\Windows\AppRepository\Packages\*SecHealth*" /S /B /A:D`) do %TI% rd /s /q "%%d"
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%ProgramData%\Microsoft\Windows\AppRepository\Packages\*Apprep.ChxApp*" /S /B /A:D`) do %TI% rd /s /q "%%d"
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%LocalAppData%\Packages\*SecHealth*" /S /B /A:D`) do %TI% rd /s /q "%%d"
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%LocalAppData%\Packages\*Apprep.ChxApp*" /S /B /A:D`) do %TI% rd /s /q "%%d"	
 	reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "SettingsPageVisibility" /t REG_SZ /d "hide:home;windowsdefender" /f >nul
 
-rem “¤ «¥­¨¥ ¯ ¯®ª ¨§ åà ­¨«¨é  WinSxS á ¡®«ìè¥© ¢¥à®ïâ­®áâìî á«®¬ ¥â ãáâ ­®¢ªã ­¥ª®â®àëå ®¡­®¢«¥­¨©.
+rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð°Ð¿Ð¾Ðº Ð¸Ð· Ñ…Ñ€Ð°Ð½Ð¸Ð»Ð¸Ñ‰Ð° WinSxS Ñ Ð±Ð¾Ð»ÑŒÑˆÐµÐ¹ Ð²ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾ÑÑ‚ÑŒÑŽ ÑÐ»Ð¾Ð¼Ð°ÐµÑ‚ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÑƒ Ð½ÐµÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ñ… Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ð¹.
 rem 	for %%i in (windows-defender, windows-senseclient-service, windows-dynamic-image) do (
 rem 			for /f "usebackq delims=" %%d In (`2^>nul dir "%SystemRoot%\WinSxS\*%%i*" /S /B /A:D`) do rd /s /q "%%d" >nul 2>&1
 rem 	)
 
-echo “¤ «¥­¨¥ ¤®¯®«­¨â¥«ì­ëå ª®¬¯®­¥­â®¢... [5/13]> "%msgFile%"
+echo Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ñ… ÐºÐ¾Ð¼Ð¿Ð¾Ð½ÐµÐ½Ñ‚Ð¾Ð²... [5/13]> "%msgFile%"
 for %%C in (
     Microsoft.Windows.Notepad.System
 	Microsoft.Windows.PowerShell.ISE
@@ -274,7 +274,7 @@ for %%C in (
 ) >nul 2>&1
 
 
-echo Žâª«îç¥­¨¥ «¨è­¥£® ¢ « ­¨à®¢é¨ª¥ § ¤ ç... [6/13] > "%msgFile%"
+echo ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð»Ð¸ÑˆÐ½ÐµÐ³Ð¾ Ð² ÐŸÐ»Ð°Ð½Ð¸Ñ€Ð¾Ð²Ñ‰Ð¸ÐºÐµ Ð·Ð°Ð´Ð°Ñ‡... [6/13] > "%msgFile%"
 schtasks /Change /TN "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)" /Disable >nul 2>&1
 schtasks /Change /TN "\Microsoft\Windows\AppID\EDP Policy Manager" /Disable >nul 2>&1
 schtasks /Change /TN "\Microsoft\Windows\AppID\PolicyConverter" /Disable >nul 2>&1
@@ -455,30 +455,30 @@ schtasks /Change /TN "\Microsoft\Windows\EdgeUpdate\Microsoft Edge Update Task M
 schtasks /Change /TN "\Microsoft\Windows\EdgeUpdate\Microsoft Edge Update Task Machine UA" /Disable >nul 2>&1
 
 
-echo Ž¯â¨¬¨§ æ¨ï ¯ à ¬¥âà®¢... [7/13] > "%msgFile%"
-Rem ƒ¨¡¥à­ æ¨ï
+echo ÐžÐ¿Ñ‚Ð¸Ð¼Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð²... [7/13] > "%msgFile%"
+Rem Ð“Ð¸Ð±ÐµÑ€Ð½Ð°Ñ†Ð¸Ñ
     powercfg -h off >nul 2>&1
 	reg add "HKLM\System\CurrentControlSet\Control\Power" /v "HibernateEnabledDefault" /t REG_DWORD /d 0x0 /f >nul 2>&1
-Rem ‡ à¥§¥à¢¨à®¢ ­­®¥ åà ­¨«¨é¥
+Rem Ð—Ð°Ñ€ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ð¾Ðµ Ñ…Ñ€Ð°Ð½Ð¸Ð»Ð¸Ñ‰Ðµ
 	Dism /Online /Set-ReservedStorageState /State:Disabled >nul 2>&1
-Rem ’®çª¨ ¢®ááâ ­®¢«¥­¨ï
+Rem Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ð¾ÑÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ
 	vssadmin resize shadowstorage /on=c: /for=c: /maxsize=1%% >nul 2>&1
 	PowerShell -Command "Disable-ComputerRestore -Drive '%SystemDrive%\'" >nul 2>&1
 	vssadmin delete shadows /all /quiet >nul 2>&1
 	reg delete "HKLM\Software\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v "RPSessionInterval" /f >nul 2>&1
-Rem Žâ«®¦¥­­ë© § ¯ãáª á«ã¦¡
+Rem ÐžÑ‚Ð»Ð¾Ð¶ÐµÐ½Ð½Ñ‹Ð¹ Ð·Ð°Ð¿ÑƒÑÐº ÑÐ»ÑƒÐ¶Ð±
 	for %%p in (EventSystem NlaSvc) do reg add "HKLM\System\CurrentControlSet\Services\%%p" /v "DelayedAutostart" /t reg_dword /d 1 /f >nul 2>&1
 	)
-Rem ‘¨áâ¥¬­ë¥ ®âç¥âë
+Rem Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð½Ñ‹Ðµ Ð¾Ñ‚Ñ‡ÐµÑ‚Ñ‹
 	"%~dp0\Work\Eventlog" >nul 2>&1
-Rem Šíè ¨ª®­®ª
+Rem ÐšÑÑˆ Ð¸ÐºÐ¾Ð½Ð¾Ðº
 	reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "MaxCachedIcons" /t REG_SZ /d 4096 /f >nul
-Rem ®à®£ à §¤¥«¥­¨ï SVC
-    PowerShell "$key = 'HKLM:\SYSTEM\CurrentControlSet\Control'; if (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -ErrorAction SilentlyContinue)) { Write-Output '  à ¬¥âà  SvcHostSplitThresholdInKB ­¥â, ®â¬¥­  ¤¥©áâ¢¨©'; Pause; Exit } elseif (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB_orig' -ErrorAction SilentlyContinue)) { Rename-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -NewName 'SvcHostSplitThresholdInKB_orig'; $mem = (Get-CimInstance Win32_OperatingSystem).TotalVisibleMemorySize + 1024000; Set-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -Value $mem -Type DWord }
-Rem “áª®à¨âì ®âªàëâ¨¥ ¯ ¯®ª
+Rem ÐŸÐ¾Ñ€Ð¾Ð³ Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ SVC
+    PowerShell "$key = 'HKLM:\SYSTEM\CurrentControlSet\Control'; if (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -ErrorAction SilentlyContinue)) { Write-Output ' ÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð° SvcHostSplitThresholdInKB Ð½ÐµÑ‚, Ð¾Ñ‚Ð¼ÐµÐ½Ð° Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹'; Pause; Exit } elseif (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB_orig' -ErrorAction SilentlyContinue)) { Rename-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -NewName 'SvcHostSplitThresholdInKB_orig'; $mem = (Get-CimInstance Win32_OperatingSystem).TotalVisibleMemorySize + 1024000; Set-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -Value $mem -Type DWord }
+Rem Ð£ÑÐºÐ¾Ñ€Ð¸Ñ‚ÑŒ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚Ð¸Ðµ Ð¿Ð°Ð¿Ð¾Ðº
 	reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell" /v "FolderType" /t REG_SZ /d NotSpecified /f >nul 2>&1
 	for %%k in (Directory.Audio Directory.Image Directory.Video) do (for %%c in (Enqueue Play) do (reg add "HKCR\SystemFileAssociations\%%k\shell\%%c" /v "LegacyDisable" /t REG_SZ /d "" /f >nul)) >nul 2>&1
-Rem Žâª«îç¨âì VBS
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ VBS
     bcdedit /set hypervisorlaunchtype off >nul
     for %%p in (
         HypervisorEnforcedCodeIntegrity
@@ -510,34 +510,34 @@ Rem Žâª«îç¨âì VBS
         AuditModeEnabled
         WasEnabledBy
     ) do reg add "HKLM\System\CurrentControlSet\Control\DeviceGuard\Scenarios\KernelShadowStacks" /v "%%p" /t reg_dword /d 0 /f >nul 2>&1
-Rem Žâª«îç¨âì DVR 
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ DVR 
     reg add "HKCR\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f >nul 
     reg add "HKCR\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\Software\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "Value" /t REG_DWORD /d 0 /f >nul
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
-Rem Œ ªá¨¬ «ì­ ï ¯à®¨§¢®¤¨â¥«ì­®áâì
+Rem ÐœÐ°ÐºÑÐ¸Ð¼Ð°Ð»ÑŒÐ½Ð°Ñ Ð¿Ñ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ
     powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul
-    for /f "tokens=4" %%a in ('powercfg /l ^| findstr /i "Œ ªá¨¬ «ì­ ï Ultimate"') do set "guid=%%a"
+    for /f "tokens=4" %%a in ('powercfg /l ^| findstr /i "ÐœÐ°ÐºÑÐ¸Ð¼Ð°Ð»ÑŒÐ½Ð°Ñ Ultimate"') do set "guid=%%a"
     powercfg /setactive !guid!
-Rem ”ã­ªæ¨ï ‚®§®¡­®¢¨âì
+Rem Ð¤ÑƒÐ½ÐºÑ†Ð¸Ñ Ð’Ð¾Ð·Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ
 	"%~dp0\Work\vivetool.exe" /disable /id:56517033 >nul
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CrossDeviceResume\Configuration" /v "IsResumeAllowed" /t REG_DWORD /d 0 /f >nul 
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CrossDeviceResume\Configuration" /v "IsOneDriveResumeAllowed" /t REG_DWORD /d 0 /f >nul
-Rem “¤ «¥­¨ï áâ àëå ¤à ©¢¥à®¢
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ€Ñ‹Ñ… Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð¾Ð²
 PowerShell -encodedCommand JABkAGkAcwBtAE8AdQB0ACAAPQAgAGQAaQBzAG0AIAAvAG8AbgBsAGkAbgBlACAALwBnAGUAdAAtAGQAcgBpAHYAZQByAHMADQAKACQATABpAG4AZQBzACAAPQAgACQAZABpAHMAbQBPAHUAdAAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEAMAANAAoAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAiAHQAaABlAE4AYQBtAGUAIgANAAoAJABEAHIAaQB2AGUAcgBzACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQATABpAG4AZQAgAGkAbgAgACQATABpAG4AZQBzACAAKQAgAHsADQAKACAAIAAgACAAJAB0AG0AcAAgAD0AIAAkAEwAaQBuAGUADQAKACAAIAAgACAAJAB0AHgAdAAgAD0AIAAkACgAJAB0AG0AcAAuAFMAcABsAGkAdAAoACAAJwA6ACcAIAApACkAWwAxAF0ADQAKACAAIAAgACAAcwB3AGkAdABjAGgAIAAoACQATwBwAGUAcgBhAHQAaQBvAG4AKQAgAHsADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AYQBtAGUAJwAgAHsAIAAkAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEYAaQBsAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARgBpAGwAZQBOAGEAbQBlACcAIAB7ACAAJABGAGkAbABlAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBFAG4AdAByACcADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARQBuAHQAcgAnACAAewAgACQARQBuAHQAcgAgAD0AIAAkAHQAeAB0AC4AVAByAGkAbQAoACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBDAGwAYQBzAHMATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUAQwBsAGEAcwBzAE4AYQBtAGUAJwAgAHsAIAAkAEMAbABhAHMAcwBOAGEAbQBlACAAPQAgACQAdAB4AHQALgBUAHIAaQBtACgAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnACAAewAgACQAVgBlAG4AZABvAHIAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEQAYQB0AGUAJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARABhAHQAZQAnACAAewAgACAAJAB0AG0AcAAgAD0AIAAkAHQAeAB0AC4AcwBwAGwAaQB0ACgAIAAnAC4AJwAgACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAdAB4AHQAIAA9ACAAIgAkACgAJAB0AG0AcABbADIAXQApAC4AJAAoACQAdABtAHAAWwAxAF0AKQAuACQAKAAkAHQAbQBwAFsAMABdAC4AVAByAGkAbQAoACkAKQAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAEQAYQB0AGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwAgAHsAIAAkAFYAZQByAHMAaQBvAG4AIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgB1AGwAbAAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAHAAYQByAGEAbQBzACAAPQAgAFsAbwByAGQAZQByAGUAZABdAEAAewAgACcARgBpAGwAZQBOAGEAbQBlACcAIAA9ACAAJABGAGkAbABlAE4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBWAGUAbgBkAG8AcgAnACAAPQAgACQAVgBlAG4AZABvAHIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBEAGEAdABlACcAIAA9ACAAJABEAGEAdABlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACcATgBhAG0AZQAnACAAPQAgACQATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAEMAbABhAHMAcwBOAGEAbQBlACcAIAA9ACAAJABDAGwAYQBzAHMATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAFYAZQByAHMAaQBvAG4AJwAgAD0AIAAkAFYAZQByAHMAaQBvAG4ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBFAG4AdAByACcAIAA9ACAAJABFAG4AdAByAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABvAGIAagAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBUAHkAcABlAE4AYQBtAGUAIABQAFMATwBiAGoAZQBjAHQAIAAtAFAAcgBvAHAAZQByAHQAeQAgACQAcABhAHIAYQBtAHMADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQARAByAGkAdgBlAHIAcwAgACsAPQAgACQAbwBiAGoADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AdQBsAGwAJwAgAHsAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAGwAYQBzAHQAIAA9ACAAJwAnAA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJAAoACQARAByAGkAdgBlAHIAcwAgAHwAIABzAG8AcgB0ACAARgBpAGwAZQBuAGEAbQBlACkAIAApACAAewANAAoAIAAgACAAIABpAGYAIAAoACQARAByAC4ARgBpAGwAZQBOAGEAbQBlACAALQBlAHEAIAAkAGwAYQBzAHQAIAAgACkAIAB7ACAAIAAkAE4AbwB0AFUAbgBpAHEAdQBlACAAKwA9ACAAJABEAHIAIAAgAH0ADQAKACAAIAAgACAAJABsAGEAcwB0ACAAPQAgACQARAByAC4ARgBpAGwAZQBOAGEAbQBlAA0ACgB9AA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAfAAgAHMAbwByAHQAIABGAGkAbABlAE4AYQBtAGUAIAB8ACAAZgB0AA0ACgAjAFMAZQBhAHIAYwBoAGkAbgBnACAAZgBvAHIAIABkAHUAcABsAGkAYwBhAHQAZQAgAGQAcgBpAHYAZQByAHMAIAANAAoAJABsAGkAcwB0ACAAPQAgACQATgBvAHQAVQBuAGkAcQB1AGUAIAB8ACAAcwBlAGwAZQBjAHQAIAAtAEUAeABwAGEAbgBkAFAAcgBvAHAAZQByAHQAeQAgAEYAaQBsAGUATgBhAG0AZQAgAC0AVQBuAGkAcQB1AGUADQAKACQAVABvAEQAZQBsACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJABsAGkAcwB0ACAAKQAgAHsADQAKACAAIAAgACAAVwByAGkAdABlAC0ASABvAHMAdAAgACIARAB1AHAAbABpAGMAYQB0AGUAIABkAHIAaQB2AGUAcgAgAGYAbwB1AG4AZAAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgACQAcwBlAGwAIAA9ACAAJABEAHIAaQB2AGUAcgBzACAAfAAgAHcAaABlAHIAZQAgAHsAIAAkAF8ALgBGAGkAbABlAE4AYQBtAGUAIAAtAGUAcQAgACQARAByACAAfQAgAHwAIABzAG8AcgB0ACAAZABhAHQAZQAgAC0ARABlAHMAYwBlAG4AZABpAG4AZwAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEADQAKACAAIAAgACAAJABzAGUAbAAgAHwAIABmAHQADQAKACAAIAAgACAAJABUAG8ARABlAGwAIAArAD0AIAAkAHMAZQBsAA0ACgB9AA0ACgAjAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAEwAaQBzAHQAIABvAGYAIABkAHIAaQB2AGUAcgAgAHYAZQByAHMAaQBvAG4AIAAgAHQAbwAgAHIAZQBtAG8AdgBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAUgBlAGQADQAKACQAVABvAEQAZQBsACAAfAAgAGYAdAANAAoAIwBEAGUAbABlAHQAaQBuAGcAIABvAGwAZAAgAGQAcgBpAHYAZQByAHMADQAKAGYAbwByAGUAYQBjAGgAIAAoACAAJABpAHQAZQBtACAAaQBuACAAJABUAG8ARABlAGwAIAApACAAewANAAoAIAAgACAAIAAkAE4AYQBtAGUAIAA9ACAAJAAoACQAaQB0AGUAbQAuAE4AYQBtAGUAKQAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAGQAZQBsAGUAdABpAG4AZwAgACQATgBhAG0AZQAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAHAAbgBwAHUAdABpAGwALgBlAHgAZQAgAC8AZABlAGwAZQB0AGUALQBkAHIAaQB2AGUAcgAgACAAJABOAGEAbQBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAWQBlAGwAbABvAHcADQAKACAAIAAgACAASQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuACAALQBDAG8AbQBtAGEAbgBkACAAIgBwAG4AcAB1AHQAaQBsAC4AZQB4AGUAIAAvAGQAZQBsAGUAdABlAC0AZAByAGkAdgBlAHIAIAAkAE4AYQBtAGUAIgANAAoAfQA= >nul 2>&1
 	
 	
-echo  áâà®©ª  –¥­âà  ®¡­®¢«¥­¨ï Windows... [8/13] > "%msgFile%"
+echo ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ° Ð¦ÐµÐ½Ñ‚Ñ€Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Windows... [8/13] > "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
-Rem ‡ ¯à¥â ­  ãáâ ­®¢ªã ¤à ©¢¥à®¢
+Rem Ð—Ð°Ð¿Ñ€ÐµÑ‚ Ð½Ð° ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÑƒ Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð¾Ð²
 	reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /v "PreventDeviceMetadataFromNetwork" /t REG_DWORD /d "1" /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\Device Metadata" /v "PreventDeviceMetadataFromNetwork" /t REG_DWORD /d "1" /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\DriverSearching" /v "SearchOrderConfig" /t REG_DWORD /d "0" /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "ExcludeWUDriversInQualityUpdate" /t REG_DWORD /d "1" /f >nul
-Rem ‡ ¯à¥â ­  ®¡­®¢«¥­¨¥ ¡ § ‡ é¨â­¨ª 
+Rem Ð—Ð°Ð¿Ñ€ÐµÑ‚ Ð½Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð±Ð°Ð· Ð—Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸ÐºÐ°
 	reg add "HKLM\Software\Policies\Microsoft\MRT" /v "DontOfferThroughWUAU" /t REG_DWORD /d "1" /f >nul
-Rem  ã§  ®¡­®¢«¥­¨©
+Rem ÐŸÐ°ÑƒÐ·Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ð¹
 	reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "PauseUpdatesStartTime" /t REG_SZ /d 2024-09-13T00:00:00Z /f >nul
 	reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "PauseUpdatesExpiryTime" /t REG_SZ /d 2077-07-07T00:00:00Z /f >nul
 
@@ -553,92 +553,92 @@ Rem  ã§  ®¡­®¢«¥­¨©
 	reg add "HKLM\Software\Microsoft\WindowsUpdate\UpdatePolicy\Settings" /v "PausedFeatureDate" /t REG_SZ /d "2077-07-07 13:00:00" /f >nul
 
 
-echo à¨¬¥­¥­¨¥ ¯®«¥§­ëå â¢¨ª®¢... [9/13] > "%msgFile%"
+echo ÐŸÑ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»ÐµÐ·Ð½Ñ‹Ñ… Ñ‚Ð²Ð¸ÐºÐ¾Ð²... [9/13] > "%msgFile%"
 	timeout /t 3 /nobreak >nul 2>&1
-Rem Žâª«îç¥­¨¥ UAC
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ UAC
     for %%a in (EnableLUA PromptOnSecureDesktop EnableVirtualization ConsentPromptBehaviorAdmin) do reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "%%a" /t REG_DWORD /d 0 /f >nul
     for %%b in (batfile cmdfile exefile cplfile mscfile) do reg add "HKLM\Software\Classes\%%b\shell\runas" /v "ProgrammaticAccessOnly" /t REG_SZ /d "" /f >nul
     reg add "HKLM\Software\Classes\exefile\shell\runas2" /v "ProgrammaticAccessOnly" /t REG_SZ /d "" /f >nul
-Rem €¤¬¨­¨áâà â¨¢­ ï ãç¥â­ ï § ¯¨áì
+Rem ÐÐ´Ð¼Ð¸Ð½Ð¸ÑÑ‚Ñ€Ð°Ñ‚Ð¸Ð²Ð½Ð°Ñ ÑƒÑ‡ÐµÑ‚Ð½Ð°Ñ Ð·Ð°Ð¿Ð¸ÑÑŒ
    net user "%UserName%" /active:yes >nul
-Rem ‘­ïâ¨¥ à¥£¨®­ «ì­ëå ®£à ­¨ç¥­¨©
+Rem Ð¡Ð½ÑÑ‚Ð¸Ðµ Ñ€ÐµÐ³Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð¾Ð³Ñ€Ð°Ð½Ð¸Ñ‡ÐµÐ½Ð¸Ð¹
 	sc start TrustedInstaller >nul
 	%TI% ren "%SystemRoot%\System32\IntegratedServicesRegionPolicySet.json" IntegratedServicesRegionPolicySet.json_bak
 	%TI% copy "%~dp0\Work\IntegratedServicesRegionPolicySet.json" "%SystemRoot%\System32"
-Rem à¨­ã¤¨â¥«ì­®¥ § ¢¥àè¥­¨¥ ¯à®£à ¬¬
+Rem ÐŸÑ€Ð¸Ð½ÑƒÐ´Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼
 reg add "HKCR\Control Panel\Desktop" /v "AutoEndTasks" /t REG_SZ /d 1 /f >nul
-Rem Žâª«îç¥­¨¥ “¤ «¥­­®£® ¯®¬®é­¨ª 
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð£Ð´Ð°Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð½Ð¸ÐºÐ°
 	reg add "HKLM\System\ControlSet001\Control\Remote Assistance" /v "fAllowToGetHelp" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\System\ControlSet001\Control\Remote Assistance" /v "fAllowFullControl" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\System\ControlSet001\Control\Terminal Server" /v "fDenyTSConnections" /t REG_DWORD /d 1 /f >nul
 	reg add "HKLM\System\ControlSet001\Control\Terminal Server\WinStations\RDP-Tcp" /v "UserAuthentication" /t REG_DWORD /d 0 /f >nul
-Rem Žâª«îç¥­¨¥ § «¨¯ ­¨ï ª« ¢¨è
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð·Ð°Ð»Ð¸Ð¿Ð°Ð½Ð¸Ñ ÐºÐ»Ð°Ð²Ð¸Ñˆ
 	reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v "Flags" /t REG_SZ /d 506 /f >nul
-Rem ‘ªàëâ¨¥ TTL
+Rem Ð¡ÐºÑ€Ñ‹Ñ‚Ð¸Ðµ TTL
 	reg add "HKLM\SYSTEM\ControlSet001\Services\Tcpip\Parameters" /v DefaultTTL /t REG_DWORD /d 0x41 /f >nul
 	reg add "HKLM\SYSTEM\ControlSet001\Services\Tcpip6\Parameters" /v DefaultTTL /t REG_DWORD /d 0x41 /f >nul
-Rem Žâª«îç¥­¨¥ ã¢¥¤®¬«¥­¨© ¨ à¥ª®¬¥­¤ æ¨© ¢ ‘¨áâ¥¬  > “¢¥¤®¬«¥­¨ï
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ð¹ Ð¸ Ñ€ÐµÐºÐ¾Ð¼ÐµÐ½Ð´Ð°Ñ†Ð¸Ð¹ Ð² Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð° > Ð£Ð²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
-Rem Žâª«îç¥­¨¥ ã¢¥¤®¬«¥­¨© ¨ à¥ª®¬¥­¤ æ¨© ¢ ¥àá®­ «¨§ æ¨ï > ãáª
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ð¹ Ð¸ Ñ€ÐµÐºÐ¾Ð¼ÐµÐ½Ð´Ð°Ñ†Ð¸Ð¹ Ð² ÐŸÐµÑ€ÑÐ¾Ð½Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ > ÐŸÑƒÑÐº
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v "ShowRecentList" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v "ShowFrequentList" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackDocs" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_IrisRecommendations" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_AccountNotifications" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_Layout" /t REG_DWORD /d 1 /f >nul
-Rem Žâª«îç¥­¨¥ à¥ª®¬¥­¤ æ¨© ¢ à®¢®¤­¨ª¥
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ñ€ÐµÐºÐ¾Ð¼ÐµÐ½Ð´Ð°Ñ†Ð¸Ð¹ Ð² ÐŸÑ€Ð¾Ð²Ð¾Ð´Ð½Ð¸ÐºÐµ
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowCloudFilesInQuickAccess" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecommendations" /t REG_DWORD /d 0 /f >nul
-Rem Žâª«îç¥­¨¥ ¤àã£¨å à¥ª®¬¥­¤ æ¨© ¨ ¯à¥¤«®¦¥­¨©
+Rem ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ñ€ÐµÐºÐ¾Ð¼ÐµÐ½Ð´Ð°Ñ†Ð¸Ð¹ Ð¸ Ð¿Ñ€ÐµÐ´Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¹
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "ContentDeliveryAllowed" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t REG_DWORD /d 0 /f >nul
-Rem “áâ ­®¢ª  DNS
-set adapters=Ethernet "¥á¯à®¢®¤­ ï á¥âì" "¥§¤à®â®¢  ¬¥à¥¦ " "Wireless network"
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° DNS
+set adapters=Ethernet "Ð‘ÐµÑÐ¿Ñ€Ð¾Ð²Ð¾Ð´Ð½Ð°Ñ ÑÐµÑ‚ÑŒ" "Ð‘ÐµÐ·Ð´Ñ€Ð¾Ñ‚Ð¾Ð²Ð° Ð¼ÐµÑ€ÐµÐ¶Ð°" "Wireless network"
 for %%a in (!adapters!) do (
 	netsh interface ipv4 set dns name=%%a static 1.1.1.1 >nul
 	netsh interface ip add dns name=%%a address=1.0.0.1 index=2 >nul
 )
 
 
-echo “áâ ­®¢ª  ¤à ©¢¥à®¢... [10/13] > "%msgFile%"
+echo Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð¾Ð²... [10/13] > "%msgFile%"
 	timeout /t 3 /nobreak >nul 2>&1
 if exist "%USERPROFILE%\Desktop\Drivers" (
     pnputil /add-driver "%USERPROFILE%\Desktop\Drivers\*.inf" /subdirs /install >nul 2>&1
     timeout /t 3 /nobreak >nul 2>&1
 ) else (
-    echo  ¯ª  á ¤à ©¢¥à ¬¨ ­¥ ®¡­ àã¦¥­ . à®¯ãáª î ãáâ ­®¢ªã ¤à ©¢¥à®¢. [10/13] > "%msgFile%"
+    echo ÐŸÐ°Ð¿ÐºÐ° Ñ Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð°Ð¼Ð¸ Ð½Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð°. ÐŸÑ€Ð¾Ð¿ÑƒÑÐºÐ°ÑŽ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÑƒ Ð´Ñ€Ð°Ð¹Ð²ÐµÑ€Ð¾Ð². [10/13] > "%msgFile%"
 )
 
 
-echo “áâ ­®¢ª  Visual C++ ¨ DirectX... [11/13] > "%msgFile%"
+echo Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Visual C++ Ð¸ DirectX... [11/13] > "%msgFile%"
 	start "" /wait "%~dp0\Work\DirectX.exe"
 	start "" /wait "%~dp0\Work\VisualCppRedist_AIO_x86_x64.exe" /aiA /gm2
 	
 
-echo “áâ ­®¢ª  ¢¨§ã «ì­ëå â¢¨ª®¢... [12/13] > "%msgFile%"
-Rem “¤ «¥­¨¥ ƒ« ¢­ ï
+echo Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð²Ð¸Ð·ÑƒÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ñ‚Ð²Ð¸ÐºÐ¾Ð²... [12/13] > "%msgFile%"
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð“Ð»Ð°Ð²Ð½Ð°Ñ
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "HubMode" /t REG_DWORD /d 1 /f >nul
     reg add "HKCU\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul
     reg add "HKCU\Software\Classes\Wow6432Node\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul
-Rem “¤ «¥­¨¥ ƒ «¥à¥ï
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð“Ð°Ð»ÐµÑ€ÐµÑ
     reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKCU\Software\Classes\Wow6432Node\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 0 /f >nul 2>&1
-Rem “¤ «¥­¨¥ ‘¥âì
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¡ÐµÑ‚ÑŒ
 	reg add "HKCU\Software\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
-Rem ’¥¬­ ï â¥¬ 
+Rem Ð¢ÐµÐ¼Ð½Ð°Ñ Ñ‚ÐµÐ¼Ð°
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f >nul 2>&1
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v SystemUsesLightTheme /t REG_DWORD /d 0 /f >nul 2>&1
-Rem “áâ ­®¢ª  ®¡®¥¢
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¾Ð±Ð¾ÐµÐ²
 	copy "%~dp0\Work\1.jpg" "%SystemRoot%\Web\Wallpaper\Windows" >nul 2>&1
 	reg add "HKCU\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d "%SystemRoot%\Web\Wallpaper\Windows\1.jpg" /f >nul 2>&1
-Rem “áâ ­®¢ª  á¨­¨å ¯ ¯®ª
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° ÑÐ¸Ð½Ð¸Ñ… Ð¿Ð°Ð¿Ð¾Ðº
 	%TI% ren "%SystemRoot%\SystemResources\imageres.dll.mun" imageres.dll.mun_bak
 	%TI% copy "%~dp0\Work\BlueIcon\imageres.dll.mun" "%SystemRoot%\SystemResources"
-	for %%f in ("File Explorer.lnk" à®¢®¤­¨ª.lnk) do del /q "%AppData%\Microsoft\Windows\Start Menu\Programs\%%~f" "%AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\%%~f" >nul 2>&1
+	for %%f in ("File Explorer.lnk" ÐŸÑ€Ð¾Ð²Ð¾Ð´Ð½Ð¸Ðº.lnk) do del /q "%AppData%\Microsoft\Windows\Start Menu\Programs\%%~f" "%AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\%%~f" >nul 2>&1
 	
 	copy "%~dp0\Work\BlueIcon\File Explorer.lnk" "%AppData%\Microsoft\Windows\Start Menu\Programs" /y >nul
 	copy "%~dp0\Work\BlueIcon\File Explorer.lnk" "%AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar" /y >nul
@@ -668,7 +668,7 @@ Rem “áâ ­®¢ª  á¨­¨å ¯ ¯®ª
 	popd
 	for %%f in ("%ProgramFiles(x86)%" "%ProgramFiles%" "%SystemDrive%\Users" "%SystemRoot%") do ATTRIB +R "%%~f" >nul 2>&1
 
-Rem “áâ ­®¢ª  Icaros
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Icaros
 	if not exist "%ProgramFiles%\WinClean\Preview" mkdir "%ProgramFiles%\WinClean\Preview" >nul 2>&1
     for %%F in (avcodec-ics-61.dll avformat-ics-61.dll avutil-ics-59.dll IcarosCache.dll IcarosPropertyHandler.dll IcarosThumbnailProvider.dll libunarr-ics.dll swscale-ics-8.dll) do (
 	move "%~dp0\Work\Icaros\%%F" "%ProgramFiles%\WinClean\Preview" >nul 2>&1) 
@@ -690,34 +690,34 @@ Rem “áâ ­®¢ª  Icaros
         reg add "HKLM\Software\Classes\%%E\ShellEx\{BB2E617C-0920-11d1-9A0B-00C04FC2D6C1}" /ve /t REG_SZ /d "{c5aec3ec-e812-4677-a9a7-4fee1f9aa000}" /f >nul 
     )
 
-Rem “áâ ­®¢ª  á¥ªã­¤ ¢ âà¥¥
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° ÑÐµÐºÑƒÐ½Ð´ Ð² Ñ‚Ñ€ÐµÐµ
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowSecondsInSystemClock /t REG_DWORD /d 1 /f >nul
-Rem “áâ ­®¢ª  ¤ âë ¢ âà¥¥
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð´Ð°Ñ‚Ñ‹ Ð² Ñ‚Ñ€ÐµÐµ
     reg add "HKCU\Control Panel\International" /v sShortDate /t REG_SZ /d "ddd, dd.MM.yy" /f >nul 2>&1
-Rem “áâ ­®¢ª  ‡ ¢¥àè¨âì § ¤ çã
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð—Ð°Ð²ÐµÑ€ÑˆÐ¸Ñ‚ÑŒ Ð·Ð°Ð´Ð°Ñ‡Ñƒ
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v "TaskbarEndTask" /t REG_DWORD /d 1 /f >nul
-Rem “¤ «¥­¨¥ «¨è­¨å §­ çª®¢
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð»Ð¸ÑˆÐ½Ð¸Ñ… Ð·Ð½Ð°Ñ‡ÐºÐ¾Ð²
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f >nul 
 	reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul 
-Rem ‘ªàëâ¨¥ ¥ª®¬¥­¤ã¥¬
+Rem Ð¡ÐºÑ€Ñ‹Ñ‚Ð¸Ðµ Ð ÐµÐºÐ¾Ð¼ÐµÐ½Ð´ÑƒÐµÐ¼
 	reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\current\device\Start" /v "HideRecommendedSection" /t REG_DWORD /d 1 /f >nul
 	reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\current\device\Education" /v "IsEducationEnvironment" /t REG_DWORD /d 1 /f >nul
 	reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecommendedSection" /t REG_DWORD /d 1 /f >nul
-Rem “áâ ­®¢ª  §­ çª   áâà®©ª¨ ¢ ãáª¥
+Rem Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð·Ð½Ð°Ñ‡ÐºÐ° ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ Ð² ÐŸÑƒÑÐºÐµ
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v "VisiblePlaces" /t REG_BINARY /d 86087352AA5143429F7B2776584659D4 /f >nul
-Rem “¤ «¥­¨ï á¦ â¨ï ®¡®¥¢
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÐ¶Ð°Ñ‚Ð¸Ñ Ð¾Ð±Ð¾ÐµÐ²
 	reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t REG_DWORD /d 0x64 /f >nul
-Rem “¤ «¥­¨¥ íªà ­  ¡«®ª¨à®¢ª¨
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ ÑÐºÑ€Ð°Ð½Ð° Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²ÐºÐ¸
 	reg add "HKLM\Software\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\Personalization" /v NoLockScreenCamera /t REG_DWORD /d 1 /f >nul
-Rem “¤ «¥­¨¥ â¥­¨ ­  §­ çª å  ¡®ç¥£® áâ®« 
+Rem Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ñ‚ÐµÐ½Ð¸ Ð½Ð° Ð·Ð½Ð°Ñ‡ÐºÐ°Ñ… Ð Ð°Ð±Ð¾Ñ‡ÐµÐ³Ð¾ ÑÑ‚Ð¾Ð»Ð°
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /t REG_DWORD /d 0 /f >nul
-Rem Žâªàë¢ âì à®¢®¤­¨ª ¢ â®â ª®¬¯ìîâ¥à
+Rem ÐžÑ‚ÐºÑ€Ñ‹Ð²Ð°Ñ‚ÑŒ ÐŸÑ€Ð¾Ð²Ð¾Ð´Ð½Ð¸Ðº Ð² Ð­Ñ‚Ð¾Ñ‚ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€
 	reg add  "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 0 /f >nul
 
 
-echo ‘¦ â¨¥ á¨áâ¥¬ë... [13/13] > "%msgFile%"
+echo Ð¡Ð¶Ð°Ñ‚Ð¸Ðµ ÑÐ¸ÑÑ‚ÐµÐ¼Ñ‹... [13/13] > "%msgFile%"
 rem compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 	pushd "%LocalAppData%\Microsoft\Windows\Explorer" >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
@@ -727,7 +727,7 @@ rem compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 	if exist IconCache.db-wal del /a /q IconCache.db-wal >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	popd >nul 2>&1
-echo ƒ®â®¢®. ¥à¥§ £àã¦ îáì...> "%msgFile%"
+echo Ð“Ð¾Ñ‚Ð¾Ð²Ð¾. ÐŸÐµÑ€ÐµÐ·Ð°Ð³Ñ€ÑƒÐ¶Ð°ÑŽÑÑŒ...> "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
 	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
 	shutdown /r /t 2
@@ -735,4 +735,4 @@ echo ƒ®â®¢®. ¥à¥§ £àã¦ îáì...> "%msgFile%"
 
 :WinVer
     for /f "skip=2 tokens=3" %%a in ('2^>nul reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber') do set /a build=%%a
-    if !build! LSS 22000 %ch%  {0c}â  ãâ¨«¨â  à ¡®â ¥â â®«ìª® ­  Windows 11{\n#} && timeout /t 3 /nobreak >nul && exit /b
+    if !build! LSS 22000 %ch%  {0c}Ð­Ñ‚Ð° ÑƒÑ‚Ð¸Ð»Ð¸Ñ‚Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð°ÐµÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð° Windows 11{\n#} && timeout /t 3 /nobreak >nul && exit /b
