@@ -22,7 +22,6 @@ Rem Фикс, если запущено из Terminal UWP
 		for %%p in (DelegationConsole DelegationTerminal) do reg add "HKCU\Console\%%%%Startup" /v "%%p" /t REG_SZ /d "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" /f >nul
 		echo. && echo  Restarting with cmd .. && timeout /t 3 /nobreak >nul && start "" "%~f0" && exit
 	)
-
 Rem Проверка версии
 	call :WinVer && exit /b
 	start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
@@ -276,6 +275,7 @@ for %%C in (
 
 
 echo Отключение лишнего в Планировщике задач... [6/13] > "%msgFile%"
+timeout /t 3 /nobreak >nul 2>&1
 schtasks /Change /TN "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)" /Disable >nul 2>&1
 schtasks /Change /TN "\Microsoft\Windows\AppID\EDP Policy Manager" /Disable >nul 2>&1
 schtasks /Change /TN "\Microsoft\Windows\AppID\PolicyConverter" /Disable >nul 2>&1
@@ -612,6 +612,7 @@ if exist "%USERPROFILE%\Desktop\Drivers" (
     timeout /t 3 /nobreak >nul 2>&1
 ) else (
     echo Папка с драйверами не обнаружена. Пропускаю установку драйверов. [10/13] > "%msgFile%"
+	timeout /t 3 /nobreak >nul 2>&1
 )
 
 
@@ -621,6 +622,7 @@ echo Установка Visual C++ и DirectX... [11/13] > "%msgFile%"
 	
 
 echo Установка визуальных твиков... [12/13] > "%msgFile%"
+    timeout /t 5 /nobreak >nul 2>&1
 Rem Удаление Главная
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "HubMode" /t REG_DWORD /d 1 /f >nul
     reg add "HKCU\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul
@@ -719,7 +721,7 @@ Rem Открывать Проводник в Этот компьютер
 
 
 echo Сжатие системы... [13/13] > "%msgFile%"
-	compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
+rem compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 	pushd "%LocalAppData%\Microsoft\Windows\Explorer" >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	del /s /q /f "IconCache*" "thumbcache*" >nul 2>&1
@@ -728,8 +730,6 @@ echo Сжатие системы... [13/13] > "%msgFile%"
 	if exist IconCache.db-wal del /a /q IconCache.db-wal >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	popd >nul 2>&1
-
-
 echo Готово. Перезагружаюсь...> "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
 	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
