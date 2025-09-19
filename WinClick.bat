@@ -65,6 +65,8 @@ for %%k in (Bags BagMRU BagsMRU) do (
 
 echo Удаление всех UWP-приложений... [2/13] > "%msgFile%"
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false } | ForEach-Object { Remove-AppxPackage -Package $_.PackageFullName -AllUsers -ErrorAction SilentlyContinue }" >nul 2>&1
+	reg add "HKLM\Software\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d "0" /f >nul 2>&1
+Rem Удаление OneDrive
 	taskkill /f /im OneDrive.exe >nul 2>&1
 	%SystemRoot%\System32\OneDriveSetup.exe /uninstall >nul 2>&1
 	rd "%UserProfile%\OneDrive" /Q /S >nul 2>&1
@@ -72,9 +74,10 @@ echo Удаление всех UWP-приложений... [2/13] > "%msgFile%"
 	rd "%ProgramData%\Microsoft OneDrive" /Q /S >nul 2>&1
 	reg delete "HKCU\Software\Microsoft\OneDrive" /f >nul 2>&1
 	reg delete "HKLM\Software\Microsoft\OneDrive" /f >nul 2>&1
-	reg add "HKLM\Software\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d "0" /f >nul 2>&1
+Rem Удаление лишних папок с приложениями в Пуске
 	rd "%AppData%\Microsoft\Windows\Start Menu\Programs\Accessibility" /Q /S >nul 2>&1
 	rd "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Accessories\System Tools" /Q /S >nul 2>&1
+Rem Удаление Помощника по удаленному подключению
 	PowerShell "Start-Process mstsc.exe -ArgumentList '/uninstall' -WindowStyle Hidden -ErrorAction SilentlyContinue"
 	timeout /t 5 /nobreak >nul 2>&1
 	taskkill /f /im mstsc.exe >nul 2>&1
@@ -254,10 +257,11 @@ Rem Эти папки можно удалять. Восстанавливают�
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%LocalAppData%\Packages\*Apprep.ChxApp*" /S /B /A:D`) do %TI% rd /s /q "%%d"	
 	reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "SettingsPageVisibility" /t REG_SZ /d "hide:home;windowsdefender" /f >nul
 
-Rem Удаление папок из хранилища WinSxS с большей вероятностью сломает установку некоторых обновлений.
+Rem Удаление папок Защитника из хранилища WinSxS (с большей вероятностью сломает установку некоторых обновлений)
 Rem 	for %%i in (windows-defender, windows-senseclient-service, windows-dynamic-image) do (
 Rem 			for /f "usebackq delims=" %%d In (`2^>nul dir "%SystemRoot%\WinSxS\*%%i*" /S /B /A:D`) do rd /s /q "%%d" >nul 2>&1
 Rem 	)
+
 
 echo Удаление дополнительных компонентов... [5/13]> "%msgFile%"
 for %%C in (
