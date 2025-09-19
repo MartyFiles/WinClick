@@ -16,12 +16,12 @@ Rem Установка переменных
 	nircmd win min ititle "WinClick by MartyFiles"
 	set msgFile=%~dp0Work\message.txt
 	
-
 Rem Фикс, если запущено из Terminal UWP
 	tasklist /fi "imagename eq WindowsTerminal.exe" 2>nul | find /i "WindowsTerminal" >nul && (
 		for %%p in (DelegationConsole DelegationTerminal) do reg add "HKCU\Console\%%%%Startup" /v "%%p" /t REG_SZ /d "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" /f >nul
 		echo. && echo  Restarting with cmd .. && timeout /t 3 /nobreak >nul && start "" "%~f0" && exit
 	)
+
 Rem Проверка версии
 	call :WinVer && exit /b
 	start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
@@ -33,14 +33,17 @@ echo Удаление мусора... [1/13]  > "%msgFile%"
 		net stop wuauserv >nul 2>&1
 		timeout /t 1 /nobreak >nul 2>&1
 		sc query wuauserv | find /i "RUNNING" >nul 2>&1 && %TI% net stop wuauserv
-	)	
+	)
+Rem Удаление файлов обновлений
 	del /q /f /s "%SystemRoot%\SoftwareDistribution\Download\*.*" >nul 2>&1
 	rd /q /s "%SystemRoot%\SoftwareDistribution\Download\" >nul 2>&1
 	del /q /f /s "%SystemRoot%\SoftwareDistribution\Download" >nul 2>&1
 	del /q /f /s "%ProgramFiles(x86)%\Microsoft\EdgeUpdate\Download\*.*" >nul 2>&1
 	rd /q /s "%ProgramFiles(x86)%\Microsoft\EdgeUpdate\Download\" >nul 2>&1
+Rem Удаление кэша Windows Store
 	del /q /f /s "%userprofile%\AppData\Local\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\*.*" >nul 2>&1
 	rd /q /s "%userprofile%\AppData\Local\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\" >nul 2>&1
+Rem Удаление кэша Проводника
 	pushd "%LocalAppData%\Microsoft\Windows\Explorer" >nul 2>&1
 	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
 	del /s /q /f "IconCache*" "thumbcache*" >nul 2>&1
@@ -102,7 +105,6 @@ echo Удаление Защитника... [4/13] > "%msgFile%"
 	exit /b
 
 :StartProcessRemove
-Rem Если раздел драйвера filter и раздел wd от defender существуют (оба) и если не найден в исключениях системный диск - добавляем в исключения.
 	reg query HKLM\System\CurrentControlset\Services\WdFilter >nul 2>&1 && reg query "HKLM\Software\Microsoft\Windows Defender" >nul 2>&1 && (
 		reg query "HKLM\Software\Microsoft\Windows Defender\Exclusions\Paths" | find /i "%SystemDrive%\" >nul 2>&1 || (
 			call :AddExclusionDef
@@ -115,7 +117,6 @@ Rem Если раздел драйвера filter и раздел wd от defend
 		)
 	)
 
-Rem Пропускаем создание копии. Если нет веток. Если нет файла. Множественная проверка на то, выполнялось ли удаление хотя бы 1 раз.
 	set "flag=0"
 	reg query "HKLM\Software\Microsoft\Windows Advanced Threat Protection" >nul 2>&1 && set "flag=1"
 	reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\WINEVT\Channels\Microsoft-Windows-Windows Defender/WHC" >nul 2>&1 && set "flag=1"
@@ -167,7 +168,6 @@ for %%x in (%ListWDServ%) do (
 	%TI% rd /s /q "%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\Modules\Defender"
 	%TI% rd /s /q "%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\Modules\DefenderPerformance"
 
-Rem Переименование 4 файлов
 	%TI% ren "%SystemRoot%\System32\SecurityHealthService.exe" "SecurityHealthService.exe_fuck"
 	%TI% ren "%SystemRoot%\System32\smartscreenps.dll" smartscreenps.dll_fuck
 	%TI% ren "%SystemRoot%\System32\wscapi.dll" wscapi.dll_fuck
@@ -176,7 +176,6 @@ Rem Переименование 4 файлов
 	%TI% del /f /q "%SystemRoot%\Containers\WindowsDefenderApplicationGuard.wim"
 	%TI% del /f /q "%SystemRoot%\Containers\serviced\WindowsDefenderApplicationGuard.wim"
 
-Rem Удаление файлов от Defender / Центра Безопасности и SmartScreen + 4 файла переименованных
 	for %%f in (
 		SecurityHealthService.exe SecurityHealthSystray.exe SecurityHealthHost.exe
 		SecurityHealthAgent.dll SecurityHealthSSO.dll SecurityHealthProxyStub.dll smartscreen.dll wscisvif.dll
@@ -186,7 +185,6 @@ Rem Удаление файлов от Defender / Центра Безопасн�
 		SecurityHealthService.exe_fuck smartscreenps.dll_fuck wscapi.dll_fuck smartscreen.exedel
 	) do %TI% del /f /q "%SystemRoot%\System32\%%f" "%SystemRoot%\SysWOW64\%%f"
 
-Rem Планировщик / Реестр
 	for %%s in ("Windows Defender Cache Maintenance" "Windows Defender Cleanup" "Windows Defender Scheduled Scan" "Windows Defender Verification"
 	) do %TI% schtasks /Delete /TN "Microsoft\Windows\Windows Defender\%%~s" /f
 	%TI% schtasks /Delete /TN "Microsoft\Windows\AppID\SmartScreenSpecific" /f
@@ -221,28 +219,24 @@ Rem Планировщик / Реестр
 	%TI% reg delete "HKLM\System\CurrentControlSet\Services\WdBoot" /f	
 ) >nul 2>&1
 	sc start VMTools >nul 2>&1
-Rem Создание в автозапуск самоисчезающих [разовых] команд для подчистки служб после ребута ПК
-	reg query "HKLM\System\CurrentControlset\Services\WdFilter" >nul 2>&1 && (
+reg query "HKLM\System\CurrentControlset\Services\WdFilter" >nul 2>&1 && (
 		call :CreateRunOnceDelReg
 		goto RemoveApps
 	)
-Rem Возвращаем цвет заголовка по-умолчанию для TI программ. Нет в чистой Windows.
+
 	reg delete "HKU\S-1-5-18\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /f >nul 2>&1
 	goto RemoveApps
  
  :CreateRunOnceDelReg
 	set "RegKey=HKLM\System\CurrentControlSet\Services"
-Rem Подчистка реестра с помощью RunOnce после ребута ПК
 	for %%p in (RegClean RegClean1) do %TI% reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "%%p" /t reg_sz /f /d "\"%~dp0Work\NSudoLG.exe\" -U:T -P:E -ShowWindowMode:Hide -Wait cmd.exe /c \"timeout /t 3 /nobreak ^& reg delete %RegKey%\WdFilter /f ^& reg delete %RegKey%\WinDefend /f ^& reg delete %RegKey%\WdNisDrv /f ^& reg delete %RegKey%\MDCoreSvc /f ^& reg delete %RegKey%\WdNisSvc /f ^& reg delete %RegKey%\WdBoot /f\"" >nul
 	exit /b
 	
 :RemoveApps
 	set "KeyAPPX=SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
-Rem Удалить из InboxApplications. Чтоб не установился заново. For SystemApps.
 	for %%p in (SecHealthUI Apprep.ChxApp) do (
 		for /f "usebackq delims=" %%n In (`2^>nul reg query "HKLM\%KeyAPPX%\InboxApplications" /f "*%%p*" /k^|findstr ^H`) do %TI% reg delete "HKLM\%KeyAPPX%\InboxApplications\%%~nxn" /f >nul 2>&1
 	)
-Rem Удалить из Applications для Store + EOL + Remove для -Allusers + SYS Remove для S-1-5-18
 	NSudoLG -U:%ArgNsudo% -ShowWindowMode:Hide -Wait PowerShell "$usrsid = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value; $filters = @('*SecHealthUI*', '*Apprep.ChxApp*'); foreach ($filter in $filters) { $packages = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -like $filter } | Select-Object -ExpandProperty PackageFullName; foreach ($app in $packages) { Remove-Item -Path \"HKLM:\%KeyAPPX%\Applications\$($app)\" -Force -Recurse -ErrorAction SilentlyContinue; $endOfLifePaths = @(\"HKLM:\%KeyAPPX%\EndOfLife\$usrsid\$($app)\", \"HKLM:\%KeyAPPX%\EndOfLife\S-1-5-18\$($app)\"); $endOfLifePaths | ForEach-Object { New-Item -Path $_ -Force | Out-Null }; Remove-AppxPackage -Package $app -AllUsers -ErrorAction SilentlyContinue }}"
 
 	for %%p in (SecHealthUI Apprep.ChxApp) do (
@@ -250,7 +244,6 @@ Rem Удалить из Applications для Store + EOL + Remove для -Alluser
 	)
 	%TI% reg delete "HKLM\%KeyAPPX%\EndOfLife" /f >nul 2>&1
 	%TI% reg add "HKLM\%KeyAPPX%\EndOfLife" /f >nul 2>&1
-Rem Эти папки можно удалять. Восстанавливаются сами, если восстановить приложение.
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%ProgramData%\Microsoft\Windows\AppRepository\Packages\*SecHealth*" /S /B /A:D`) do %TI% rd /s /q "%%d"
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%ProgramData%\Microsoft\Windows\AppRepository\Packages\*Apprep.ChxApp*" /S /B /A:D`) do %TI% rd /s /q "%%d"
 	for /f "usebackq delims=" %%d In (`2^>nul Dir "%LocalAppData%\Packages\*SecHealth*" /S /B /A:D`) do %TI% rd /s /q "%%d"
@@ -287,184 +280,172 @@ for %%C in (
 
 echo Отключение лишнего в Планировщике задач... [6/13] > "%msgFile%"
 timeout /t 3 /nobreak >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AppID\EDP Policy Manager" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AppID\PolicyConverter" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\MareBackup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\PcaPatchDbTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\SdbinstMergeDbTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\StartupAppTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\ProgramDataUpdater" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Application Experience\ProgramInventoryUpdater" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ApplicationData\appuriverifierdaily" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ApplicationData\appuriverifierinstall" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ApplicationData\DsSvcCleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AppxDeploymentClient\Pre-staged app cleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AppxDeploymentClient\UCPD velocity" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Autochk\Proxy" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AutoLogger\AutoLogger-Diagtrack-Listener" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\AutoLogger\AutoLogger-FileSizeTracking" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CEIP\Uploader" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CertificateServicesClient\AikCertEnrollTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CertificateServicesClient\CryptoPolicyTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CertificateServicesClient\KeyPreGenTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CertificateServicesClient\SystemTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Cleanup\UpdateCleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Clip\License Validation" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Clip\LicenseImdsIntegration" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CloudExperienceHost\SyncHost" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CloudRestore\Backup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\CloudRestore\Restore" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ContactSupport\Scheduled" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Customer Experience Improvement Program\BthSQM" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Customer Experience Improvement Program\Uploader" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Device Information\Device" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Device Information\Device User" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Device Setup\Driver Recovery on Reboot" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Device Setup\Metadata Refresh" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\HandleCommand" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\HandleWnsCommand" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\IntegrityCheck" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\LocateCommandUserSession" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceAccountChange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceLocationRightsChange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePeriodic24" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePolicyChange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceProtectionStateChanged" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceSettingChange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DeviceDirectoryClient\RegisterUserDevice" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnosis\Scheduled" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnosis\UnexpectedCodepath" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskCleanup\SilentCleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticResolver" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskDiagnostic\DiagnosticResolver" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskDiagnostic\DiskDiagnostic" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskFootprint\Diagnostics" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DiskFootprint\StorageSense" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\DUSM\dusmtask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ErrorReporting\QueueReporting" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ErrorReporting\KernelCeipTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ExploitGuard\ExploitGuard MDM policy Refresh" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Feedback\Siuf\DmClient" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioUpload" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioRun" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Feedback\Siuf\DmClientOnUserSignIn" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\File Classification Infrastructure\Property Definition Sync" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\FileHistory\File History (maintenance mode)" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Help\OEMSupport" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Help\WindowsHelpUpdateTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\HelloFace\FODCleanupTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\HelloFace\FeatureCleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\InputSettingsRestoreDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\LocalUserSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\MouseSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\PenSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\RemoteMouseSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\RemotePenSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\RemoteTouchpadSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\input\TouchpadSyncDataAvailable" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\InstallService\WakeUpAndContinueUpdates" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\InstallService\WakeUpAndScanForUpdates" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\International\Synchronize Language Settings" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\LanguageComponentsInstaller\Installation" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\LanguageComponentsInstaller\ReconcileLanguageResources" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\LanguageComponentsInstaller\Uninstallation" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\License Manager\TempSignedLicenseExchange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Location\WindowsActionDialog" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Maintenance\WinSAT" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Maps\MapsToastTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Maps\MapsUpdateTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\MemoryDiagnostic\AutomaticOfflineMemoryDiagnostic" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\NlaSvc\WiFiTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Offline Files\Background Synchronization" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Offline Files\Logon Synchronization" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PCRPF\PCR Prediction Framework Firmware Update Task" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PerformanceTrace\WhesvcToast" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PI\Secure-Boot-Update" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PI\Sqm-Tasks" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Pluton\Pluton-Ksp-Provisioning" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Printing\EduPrintProv" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Printing\PrintJobCleanupTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PushToInstall\LoginCheck" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\PushToInstall\Registration" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Ras\MobilityManager" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\ReFsDedupSvc\Initialization" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Registry\RegIdleBackup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Search\IndexerDiagnosticsTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Search\SearchIndexerMaintenance" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Setup\SetupCleanupTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\SharedPC\Account Cleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\FamilySafetyMonitor" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\FamilySafetyRefreshTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\ThemeAssetTask_SyncFODState" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\ThemesSyncedImageDownload" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\UndockedFlightingUpdate" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Shell\UpdateUserPictureTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Storage Tiers Management\Storage Tiers Optimization" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Subscription\EnableLicenseAcquisition" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Subscription\LicenseAcquisition" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Sysmain\WsSwapAssessmentTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Sysmain\HybridDriveCacheRebalance" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Sysmain\HybridDriveCachePrepopulate" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UPnP\UPnPHostConfig" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\CleanupUpdateTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\User Profile Service\HiveUploadTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WaaSMedic\PerformRemediation" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WaaSMedic\ScanForUpdates" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WaaSMedic\WsusScan" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Error Reporting\QueueReporting" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Error Reporting\ReportQueue" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Filtering Platform\BfeOnServiceStartTypeChange" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsAI\Recall\InitialConfiguration" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsAI\Recall\PolicyConfiguration" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsAI\Settings\InitialConfiguration" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsAI\Copilot\CopilotDataCollectionTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsAI\Insights\InsightsDataCollectionTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsUpdate\Refresh Group Policy Cache" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WlanSvc\CDSSync" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WOF\WIM-Hash-Management" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WOF\WIM-Hash-Validation" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Workplace Join\Automatic-Device-Join" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Workplace Join\Device-Sync" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Workplace Join\Recovery-Check" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UNP\RunCampaignManager" /Disable >nul 2>&1
-schtasks /Change /TN "\MicrosoftEdgeUpdateTaskMachineCore" /Disable >nul 2>&1
-schtasks /Change /TN "\MicrosoftEdgeUpdateTaskMachineUA" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Windows Defender\Windows Defender Verification" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\WindowsUpdate\Schedule Scan" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_Display" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_ReadyToReboot" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_ReadyToDownload" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_StartDownload" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\Schedule Scan" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Office\OfficeTelemetryAgentLogOn" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Office\OfficeTelemetryAgentFallBack" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\XblGameSave\XblGameSaveTask" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\XblGameSave\XblGameSaveTaskLogon" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\OneDrive\OneDrive Standalone Update Task" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnostics\RecommendedTroubleshootingScanner" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnostics\Scheduled" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\Diagnostics\UnexpectedCodepath" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\EdgeUpdate\Microsoft Edge Update Task Machine Core" /Disable >nul 2>&1
-schtasks /Change /TN "\Microsoft\Windows\EdgeUpdate\Microsoft Edge Update Task Machine UA" /Disable >nul 2>&1
+for %%T in (
+    "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)"
+    "\Microsoft\Windows\AppID\EDP Policy Manager"
+    "\Microsoft\Windows\AppID\PolicyConverter"
+    "\Microsoft\Windows\Application Experience\MareBackup"
+    "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
+    "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp"
+    "\Microsoft\Windows\Application Experience\PcaPatchDbTask"
+    "\Microsoft\Windows\Application Experience\SdbinstMergeDbTask"
+    "\Microsoft\Windows\Application Experience\StartupAppTask"
+    "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
+    "\Microsoft\Windows\Application Experience\ProgramInventoryUpdater"
+    "\Microsoft\Windows\ApplicationData\appuriverifierdaily"
+    "\Microsoft\Windows\ApplicationData\appuriverifierinstall"
+    "\Microsoft\Windows\ApplicationData\DsSvcCleanup"
+    "\Microsoft\Windows\AppxDeploymentClient\Pre-staged app cleanup"
+    "\Microsoft\Windows\AppxDeploymentClient\UCPD velocity"
+    "\Microsoft\Windows\Autochk\Proxy"
+    "\Microsoft\Windows\AutoLogger\AutoLogger-Diagtrack-Listener"
+    "\Microsoft\Windows\AutoLogger\AutoLogger-FileSizeTracking"
+    "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask"
+    "\Microsoft\Windows\CEIP\Uploader"
+    "\Microsoft\Windows\CertificateServicesClient\AikCertEnrollTask"
+    "\Microsoft\Windows\CertificateServicesClient\CryptoPolicyTask"
+    "\Microsoft\Windows\CertificateServicesClient\KeyPreGenTask"
+    "\Microsoft\Windows\CertificateServicesClient\SystemTask"
+    "\Microsoft\Windows\Cleanup\UpdateCleanup"
+    "\Microsoft\Windows\Clip\License Validation"
+    "\Microsoft\Windows\Clip\LicenseImdsIntegration"
+    "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask"
+    "\Microsoft\Windows\CloudExperienceHost\SyncHost"
+    "\Microsoft\Windows\CloudRestore\Backup"
+    "\Microsoft\Windows\CloudRestore\Restore"
+    "\Microsoft\Windows\ContactSupport\Scheduled"
+    "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator"
+    "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask"
+    "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip"
+    "\Microsoft\Windows\Customer Experience Improvement Program\BthSQM"
+    "\Microsoft\Windows\Customer Experience Improvement Program\Uploader"
+    "\Microsoft\Windows\Device Information\Device"
+    "\Microsoft\Windows\Device Information\Device User"
+    "\Microsoft\Windows\Device Setup\Driver Recovery on Reboot"
+    "\Microsoft\Windows\Device Setup\Metadata Refresh"
+    "\Microsoft\Windows\DeviceDirectoryClient\HandleCommand"
+    "\Microsoft\Windows\DeviceDirectoryClient\HandleWnsCommand"
+    "\Microsoft\Windows\DeviceDirectoryClient\IntegrityCheck"
+    "\Microsoft\Windows\DeviceDirectoryClient\LocateCommandUserSession"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceAccountChange"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceLocationRightsChange"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePeriodic24"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePolicyChange"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceProtectionStateChanged"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceSettingChange"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterUserDevice"
+    "\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
+    "\Microsoft\Windows\Diagnosis\Scheduled"
+    "\Microsoft\Windows\Diagnosis\UnexpectedCodepath"
+    "\Microsoft\Windows\DiskCleanup\SilentCleanup"
+    "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector"
+    "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticResolver"
+    "\Microsoft\Windows\DiskDiagnostic\DiagnosticResolver"
+    "\Microsoft\Windows\DiskDiagnostic\DiskDiagnostic"
+    "\Microsoft\Windows\DiskFootprint\Diagnostics"
+    "\Microsoft\Windows\DiskFootprint\StorageSense"
+    "\Microsoft\Windows\DUSM\dusmtask"
+    "\Microsoft\Windows\ErrorReporting\QueueReporting"
+    "\Microsoft\Windows\ErrorReporting\KernelCeipTask"
+    "\Microsoft\Windows\ExploitGuard\ExploitGuard MDM policy Refresh"
+    "\Microsoft\Windows\Feedback\Siuf\DmClient"
+    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"
+    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioUpload"
+    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioRun"
+    "\Microsoft\Windows\Feedback\Siuf\DmClientOnUserSignIn"
+    "\Microsoft\Windows\File Classification Infrastructure\Property Definition Sync"
+    "\Microsoft\Windows\FileHistory\File History (maintenance mode)"
+    "\Microsoft\Windows\Help\OEMSupport"
+    "\Microsoft\Windows\Help\WindowsHelpUpdateTask"
+    "\Microsoft\Windows\HelloFace\FODCleanupTask"
+    "\Microsoft\Windows\HelloFace\FeatureCleanup"
+    "\Microsoft\Windows\input\InputSettingsRestoreDataAvailable"
+    "\Microsoft\Windows\input\LocalUserSyncDataAvailable"
+    "\Microsoft\Windows\input\MouseSyncDataAvailable"
+    "\Microsoft\Windows\input\PenSyncDataAvailable"
+    "\Microsoft\Windows\input\RemoteMouseSyncDataAvailable"
+    "\Microsoft\Windows\input\RemotePenSyncDataAvailable"
+    "\Microsoft\Windows\input\RemoteTouchpadSyncDataAvailable"
+    "\Microsoft\Windows\input\TouchpadSyncDataAvailable"
+    "\Microsoft\Windows\InstallService\WakeUpAndContinueUpdates"
+    "\Microsoft\Windows\InstallService\WakeUpAndScanForUpdates"
+    "\Microsoft\Windows\International\Synchronize Language Settings"
+    "\Microsoft\Windows\LanguageComponentsInstaller\Installation"
+    "\Microsoft\Windows\LanguageComponentsInstaller\ReconcileLanguageResources"
+    "\Microsoft\Windows\LanguageComponentsInstaller\Uninstallation"
+    "\Microsoft\Windows\License Manager\TempSignedLicenseExchange"
+    "\Microsoft\Windows\Location\WindowsActionDialog"
+    "\Microsoft\Windows\Maintenance\WinSAT"
+    "\Microsoft\Windows\Maps\MapsToastTask"
+    "\Microsoft\Windows\Maps\MapsUpdateTask"
+    "\Microsoft\Windows\MemoryDiagnostic\AutomaticOfflineMemoryDiagnostic"
+    "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic"
+    "\Microsoft\Windows\NlaSvc\WiFiTask"
+    "\Microsoft\Windows\Offline Files\Background Synchronization"
+    "\Microsoft\Windows\Offline Files\Logon Synchronization"
+    "\Microsoft\Windows\PCRPF\PCR Prediction Framework Firmware Update Task"
+    "\Microsoft\Windows\PerformanceTrace\WhesvcToast"
+    "\Microsoft\Windows\PI\Secure-Boot-Update"
+    "\Microsoft\Windows\PI\Sqm-Tasks"
+    "\Microsoft\Windows\Pluton\Pluton-Ksp-Provisioning"
+    "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem"
+    "\Microsoft\Windows\Printing\EduPrintProv"
+    "\Microsoft\Windows\Printing\PrintJobCleanupTask"
+    "\Microsoft\Windows\PushToInstall\LoginCheck"
+    "\Microsoft\Windows\PushToInstall\Registration"
+    "\Microsoft\Windows\Ras\MobilityManager"
+    "\Microsoft\Windows\ReFsDedupSvc\Initialization"
+    "\Microsoft\Windows\Registry\RegIdleBackup"
+    "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask"
+    "\Microsoft\Windows\RetailDemo\CleanupOfflineContent"
+    "\Microsoft\Windows\Search\IndexerDiagnosticsTask"
+    "\Microsoft\Windows\Search\SearchIndexerMaintenance"
+    "\Microsoft\Windows\Setup\SetupCleanupTask"
+    "\Microsoft\Windows\SharedPC\Account Cleanup"
+    "\Microsoft\Windows\Shell\FamilySafetyMonitor"
+    "\Microsoft\Windows\Shell\FamilySafetyRefreshTask"
+    "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance"
+    "\Microsoft\Windows\Shell\ThemeAssetTask_SyncFODState"
+    "\Microsoft\Windows\Shell\ThemesSyncedImageDownload"
+    "\Microsoft\Windows\Shell\UndockedFlightingUpdate"
+    "\Microsoft\Windows\Shell\UpdateUserPictureTask"
+    "\Microsoft\Windows\Storage Tiers Management\Storage Tiers Optimization"
+    "\Microsoft\Windows\Subscription\EnableLicenseAcquisition"
+    "\Microsoft\Windows\Subscription\LicenseAcquisition"
+    "\Microsoft\Windows\Sysmain\WsSwapAssessmentTask"
+    "\Microsoft\Windows\Sysmain\HybridDriveCacheRebalance"
+    "\Microsoft\Windows\Sysmain\HybridDriveCachePrepopulate"
+    "\Microsoft\Windows\UPnP\UPnPHostConfig"
+    "\Microsoft\Windows\UpdateOrchestrator\CleanupUpdateTask"
+    "\Microsoft\Windows\User Profile Service\HiveUploadTask"
+    "\Microsoft\Windows\WaaSMedic\PerformRemediation"
+    "\Microsoft\Windows\WaaSMedic\ScanForUpdates"
+    "\Microsoft\Windows\WaaSMedic\WsusScan"
+    "\Microsoft\Windows\Windows Error Reporting\QueueReporting"
+    "\Microsoft\Windows\Windows Error Reporting\ReportQueue"
+    "\Microsoft\Windows\Windows Filtering Platform\BfeOnServiceStartTypeChange"
+    "\Microsoft\Windows\WindowsAI\Recall\InitialConfiguration"
+    "\Microsoft\Windows\WindowsAI\Recall\PolicyConfiguration"
+    "\Microsoft\Windows\WindowsAI\Settings\InitialConfiguration"
+    "\Microsoft\Windows\WindowsAI\Copilot\CopilotDataCollectionTask"
+    "\Microsoft\Windows\WindowsAI\Insights\InsightsDataCollectionTask"
+    "\Microsoft\Windows\WindowsUpdate\Refresh Group Policy Cache"
+    "\Microsoft\Windows\WlanSvc\CDSSync"
+    "\Microsoft\Windows\WOF\WIM-Hash-Management"
+    "\Microsoft\Windows\WOF\WIM-Hash-Validation"
+    "\Microsoft\Windows\Workplace Join\Automatic-Device-Join"
+    "\Microsoft\Windows\Workplace Join\Device-Sync"
+    "\Microsoft\Windows\Workplace Join\Recovery-Check"
+    "\Microsoft\Windows\UNP\RunCampaignManager"
+    "\MicrosoftEdgeUpdateTaskMachineCore"
+    "\MicrosoftEdgeUpdateTaskMachineUA"
+    "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance"
+    "\Microsoft\Windows\Windows Defender Cleanup"
+    "\Microsoft\Windows\Windows Defender Scheduled Scan"
+    "\Microsoft\Windows\Windows Defender Verification"
+) do (
+    schtasks /Change /TN %%T /Disable >nul 2>&1
+)
 
 
 echo Оптимизация параметров... [7/13] > "%msgFile%"
@@ -549,7 +530,7 @@ Rem Запрет на установку драйверов
 	reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "ExcludeWUDriversInQualityUpdate" /t REG_DWORD /d "1" /f >nul
 Rem Запрет на обновление баз Защитника
 	reg add "HKLM\Software\Policies\Microsoft\MRT" /v "DontOfferThroughWUAU" /t REG_DWORD /d "1" /f >nul
-Rem Пауза обновлений
+Rem Пауза обновлений до 07.07.77
 	reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "PauseUpdatesStartTime" /t REG_SZ /d 2024-09-13T00:00:00Z /f >nul
 	reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "PauseUpdatesExpiryTime" /t REG_SZ /d 2077-07-07T00:00:00Z /f >nul
 
@@ -577,7 +558,7 @@ Rem Снятие региональных ограничений
 	sc start TrustedInstaller >nul
 	%TI% ren "%SystemRoot%\System32\IntegratedServicesRegionPolicySet.json" IntegratedServicesRegionPolicySet.json_bak
 	%TI% copy "%~dp0\Work\IntegratedServicesRegionPolicySet.json" "%SystemRoot%\System32"
-Rem Принудительное завершение программ
+Rem Принудительное завершение программ при зависании
 reg add "HKCR\Control Panel\Desktop" /v "AutoEndTasks" /t REG_SZ /d 1 /f >nul
 Rem Отключение Удаленного помощника
 	reg add "HKLM\System\ControlSet001\Control\Remote Assistance" /v "fAllowToGetHelp" /t REG_DWORD /d 0 /f >nul
@@ -618,30 +599,32 @@ for %%a in (!adapters!) do (
 
 echo Установка драйверов... [10/13] > "%msgFile%"
 	timeout /t 3 /nobreak >nul 2>&1
+Rem Если есть папка Drivers на Рабочем столе
 if exist "%USERPROFILE%\Desktop\Drivers" (
     pnputil /add-driver "%USERPROFILE%\Desktop\Drivers\*.inf" /subdirs /install >nul 2>&1
     timeout /t 3 /nobreak >nul 2>&1
 ) else (
+Rem Если нет папки Driver на Рабочем столе
     echo Папка с драйверами не обнаружена. Пропускаю установку драйверов. [10/13] > "%msgFile%"
 	timeout /t 3 /nobreak >nul 2>&1
 )
 
 
 echo Установка Visual C++ и DirectX... [11/13] > "%msgFile%"
-	start "" /wait "%~dp0\Work\DirectX.exe"
 	start "" /wait "%~dp0\Work\VisualCppRedist_AIO_x86_x64.exe" /aiA /gm2
+	start "" /wait "%~dp0\Work\DirectX.exe"
 	
 
 echo Установка визуальных твиков... [12/13] > "%msgFile%"
     timeout /t 5 /nobreak >nul 2>&1
-Rem Удаление Главная
+Rem Удаление Главная из Проводника 
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "HubMode" /t REG_DWORD /d 1 /f >nul
     reg add "HKCU\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul
     reg add "HKCU\Software\Classes\Wow6432Node\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul
-Rem Удаление Галерея
+Rem Удаление Галерея из Проводника 
     reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKCU\Software\Classes\Wow6432Node\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 0 /f >nul 2>&1
-Rem Удаление Сеть
+Rem Удаление Сеть из Проводника 
 	reg add "HKCU\Software\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
 Rem Темная тема
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f >nul 2>&1
@@ -682,7 +665,7 @@ Rem Установка синих папок
 	popd
 	for %%f in ("%ProgramFiles(x86)%" "%ProgramFiles%" "%SystemDrive%\Users" "%SystemRoot%") do ATTRIB +R "%%~f" >nul 2>&1
 
-Rem Установка Icaros
+Rem Установка дополнительных эскизов через Icaros
 	if not exist "%ProgramFiles%\WinClean\Preview" mkdir "%ProgramFiles%\WinClean\Preview" >nul 2>&1
     for %%F in (avcodec-ics-61.dll avformat-ics-61.dll avutil-ics-59.dll IcarosCache.dll IcarosPropertyHandler.dll IcarosThumbnailProvider.dll libunarr-ics.dll swscale-ics-8.dll) do (
 	copy "%~dp0\Work\Icaros\%%F" "%ProgramFiles%\WinClean\Preview" >nul 2>&1) 
@@ -733,20 +716,14 @@ Rem Открывать Проводник в Этот компьютер
 
 echo Сжатие системы... [13/13] > "%msgFile%"
 	compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
-	pushd "%LocalAppData%\Microsoft\Windows\Explorer" >nul 2>&1
-	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
-	del /s /q /f "IconCache*" "thumbcache*" >nul 2>&1
-	popd >nul 2>&1
-	pushd "%LocalAppData%" >nul 2>&1	if exist IconCache.db del /a /q IconCache.db >nul 2>&1
-	if exist IconCache.db-wal del /a /q IconCache.db-wal >nul 2>&1
-	del /s /q /a:h "IconCache*" "thumbcache*" >nul 2>&1
-	popd >nul 2>&1
 echo Готово. Перезагружаюсь...> "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
 	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
+Rem Перезагрузка
 	shutdown /r /t 2
 	Exit
 
+Rem Проверка версии Windows
 :WinVer
     for /f "skip=2 tokens=3" %%a in ('2^>nul reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber') do set /a build=%%a
     if !build! LSS 22000 %ch%  {0c}Эта утилита работает только на Windows 11{\n#} && timeout /t 3 /nobreak >nul && exit /b
