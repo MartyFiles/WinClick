@@ -5,7 +5,7 @@
 </div>
 
 #
-![WinClick](https://i.ibb.co/xS2m02Gk/8-B83-EDB6-1-D8-C-414-D-AD6-C-E7-AFB32-FF743.png)
+![WinClick](https://i.ibb.co/JjKjHzp7/Post-copy.png)
 
 <div align="center">
 
