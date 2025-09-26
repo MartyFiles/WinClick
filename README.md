@@ -1,10 +1,12 @@
 <div align="center">
 
-### WinClick
-Утилита для All in One настройки и оптимизации Windows 11 в один клик!
+### <img width="128px" src="https://i.ibb.co/0yM1WFqb/ai6k4-ov2am-001-copy.png" /> 
+<strong>WinClick</strong> — утилита для All in One настройки и оптимизации Windows 11 в один клик!
+
 </div>
 
 #
+
 ![WinClick](https://i.ibb.co/JjKjHzp7/Post-copy.png)
 
 <div align="center">
