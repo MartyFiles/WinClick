@@ -11,7 +11,7 @@
 
 <div align="center">
 
-  ![Скачиваний](https://img.shields.io/github/downloads/MartyFiles/WinClick/Release/total?style=for-the-badge&label=Скачиваний&color=blue&logo=download)
+![Скачиваний](https://img.shields.io/github/downloads/MartyFiles/WinClick/Release/total?style=for-the-badge&label=Скачиваний&color=blue&logo=download)
 
 </div>
 
