@@ -109,7 +109,7 @@ $newStyle = $exStyle -bor [User32]::WS_EX_TOOLWINDOW
 # $topmostTimer = New-Object System.Windows.Threading.DispatcherTimer
 # $topmostTimer.Interval = [TimeSpan]::FromMilliseconds(500)
 # $topmostTimer.Add_Tick({ Set-AlwaysOnTop })
-# $topmostTimer.Start()
+# $topmostTimer.Start() 
 
 # Показываем окно
 $window.ShowDialog() | Out-Null
