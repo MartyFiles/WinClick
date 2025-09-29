@@ -543,7 +543,8 @@ Rem Пауза обновлений до 07.07.77
 	reg add "HKLM\Software\Microsoft\WindowsUpdate\UpdatePolicy\Settings" /v "PausedQualityStatus" /t REG_DWORD /d 1 /f >nul
 	reg add "HKLM\Software\Microsoft\WindowsUpdate\UpdatePolicy\Settings" /v "PausedQualityDate" /t REG_SZ /d "2077-07-07 13:00:00" /f >nul
 	reg add "HKLM\Software\Microsoft\WindowsUpdate\UpdatePolicy\Settings" /v "PausedFeatureDate" /t REG_SZ /d "2077-07-07 13:00:00" /f >nul
-
+Rem Запрет автоматических обновлений
+	reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d 1 /f >nul
 
 echo Применение полезных твиков... [9/13] > "%msgFile%"
 	timeout /t 3 /nobreak >nul 2>&1
@@ -711,6 +712,8 @@ Rem Удаление тени на значках Рабочего стола
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /t REG_DWORD /d 0 /f >nul
 Rem Открывать Проводник в Этот компьютер
 	reg add  "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 0 /f >nul
+Rem Показывать расширения файлов
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul
 
 
 echo Сжатие системы... [13/13] > "%msgFile%"
@@ -718,6 +721,8 @@ echo Сжатие системы... [13/13] > "%msgFile%"
 echo Готово. Перезагружаюсь...> "%msgFile%"
 	timeout /t 5 /nobreak >nul 2>&1
 	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
+Rem Очистка Центра уведомлений
+	Unlocker "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db" "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-shm" "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-wal" >nul 
 Rem Перезагрузка
 	shutdown /r /t 2
 	Exit
