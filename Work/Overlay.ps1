@@ -100,16 +100,16 @@ $newStyle = $exStyle -bor [User32]::WS_EX_TOOLWINDOW
 [User32]::SetWindowLong($hwnd, [User32]::GWL_EXSTYLE, $newStyle) | Out-Null
 
 # Функция удержания окна поверх всех, без активации
-function Set-AlwaysOnTop {
-    [WinAPI]::SetWindowPos($hwnd, [WinAPI]::HWND_TOPMOST, 0,0,0,0,
-        [WinAPI]::SWP_NOMOVE -bor [WinAPI]::SWP_NOSIZE -bor [WinAPI]::SWP_NOACTIVATE) | Out-Null
-}
+# function Set-AlwaysOnTop {
+#     [WinAPI]::SetWindowPos($hwnd, [WinAPI]::HWND_TOPMOST, 0,0,0,0,
+#         [WinAPI]::SWP_NOMOVE -bor [WinAPI]::SWP_NOSIZE -bor [WinAPI]::SWP_NOACTIVATE) | Out-Null
+# }
 
 # Таймер для повторного удержания окна наверху каждые 500 мс
-$topmostTimer = New-Object System.Windows.Threading.DispatcherTimer
-$topmostTimer.Interval = [TimeSpan]::FromMilliseconds(500)
-$topmostTimer.Add_Tick({ Set-AlwaysOnTop })
-$topmostTimer.Start()
+# $topmostTimer = New-Object System.Windows.Threading.DispatcherTimer
+# $topmostTimer.Interval = [TimeSpan]::FromMilliseconds(500)
+# $topmostTimer.Add_Tick({ Set-AlwaysOnTop })
+# $topmostTimer.Start()
 
 # Показываем окно
 $window.ShowDialog() | Out-Null
