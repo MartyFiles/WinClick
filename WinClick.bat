@@ -557,7 +557,11 @@ Rem Показывать расширения файлов
 
 echo Сжатие системы... [12/12] > "%msgFile%"
 Rem Очистка Центра уведомлений
-	Unlocker "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db" "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-shm" "%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-wal" >nul 
+	for %%F in (
+		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db"
+		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-shm"
+		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-wal"
+	) do %TI% del /q /f /s %%F >nul
 Rem Сжатие файлов
 	compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
 echo Готово. Перезагружаюсь...> "%msgFile%"
