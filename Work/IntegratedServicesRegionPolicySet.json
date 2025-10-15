@@ -528,7 +528,7 @@
       "defaultState": "enabled",
       "conditions": {
         "region": {
-          "disabled": ["CN", "IR", "CU", "KP", "SY"]
+          "disabled": ["CN", "RU" , "BY", "IR", "CU", "KP", "SY"]
         }
       }
     },
@@ -558,7 +558,7 @@
       "defaultState": "enabled",
       "conditions": {
         "region": {
-          "disabled": ["CN", "IR", "CU", "KP", "SY"]
+          "disabled": ["CN", "RU" , "BY", "IR", "CU", "KP", "SY"]
         }
       }
     },
@@ -638,7 +638,7 @@
       "defaultState": "disabled",
       "conditions": {
         "region": {
-          "enabled": ["RU", "UA", "KZ", "BL", "AT", "BE", "BG", "BR", "CA", "CH", "CN", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GB", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "KR", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "VN", "YT"]
+          "enabled": ["AT", "BE", "BG", "BR", "CA", "CH", "CN", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GB", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "KR", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "VN", "YT"]
         }
       }
     },
@@ -649,16 +649,6 @@
       "conditions": {
         "region": {
           "disabled": ["RU", "UA", "KZ", "BL", "AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "YT"]
-        }
-      }
-    },
-    {
-      "$comment": "Manages Click to Do availability by region",
-      "guid": "{d8aece8b-21e4-43ed-96ef-fba681cbb5c8}",
-      "defaultState": "enabled",
-      "conditions": {
-        "region": {
-          "disabled": []
         }
       }
     },
@@ -699,6 +689,36 @@
       "conditions": {
         "region": {
           "disabled": ["RU", "UA", "KZ", "BL", "AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "YT"]
+        }
+      }
+    },
+    {
+      "$comment": "Settings Agent is disabled in some regions",
+      "guid": "{4997d2b6-85cc-4c6c-93e4-bbc820f218ee}",
+      "defaultState": "enabled",
+      "conditions": {
+        "region": {
+          "disabled": ["CA", "CN", "CU", "IR", "KP", "RU", "SY"]
+        }
+      }
+    },
+    {
+      "$comment": "Microsoft Store has specific options available in some regions, such as ability to uninstall",
+      "guid": "{9a453b66-5ea7-4322-9aba-b054e914cc67}",
+      "defaultState": "disabled",
+      "conditions": {
+        "region": {
+          "enabled": ["RU", "UA", "KZ", "BL", "AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "YT"]
+        }
+      }
+    },
+    {
+      "$comment": "ShareWindowCommandSource API participation unrestricted to all share providers in DMA region",
+      "guid": "{b30e775c-9f50-4f5c-8a3e-ab8c78d439e0}",
+      "defaultState": "disabled",
+      "conditions": {
+        "region": {
+          "enabled": ["RU", "UA", "KZ", "BL", "AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GF", "GP", "GR", "HR", "HU", "IE", "IS", "IT", "LI", "LT", "LU", "LV", "MT", "MQ", "NL", "NO", "PL", "PT", "RE", "RO", "SE", "SI", "SK", "YT"]
         }
       }
     }
