@@ -1,6 +1,7 @@
 @echo off
 	cls
 	Title WinClick by MartyFiles
+Rem https://t.me/martyfiles
 	Color 0f
 	chcp 866 >nul
 	echo "%~dp0\Work" | findstr /r "[()!]" >nul && echo Путь до .bat содержит недопустимые символы. && timeout /t 7 >nul && exit
@@ -9,7 +10,6 @@
 	reg query "HKU\S-1-5-19" >nul 2>&1 || nircmd elevate "%~f0" && exit
 
 Rem Установка переменных
-	set "ch=cecho.exe"
 	set "TI=NSudoLG -U:T -P:E -ShowWindowMode:Hide -Wait cmd.exe /c"
 	mode 55,10 >nul
 	nircmd win min ititle "WinClick by MartyFiles"
