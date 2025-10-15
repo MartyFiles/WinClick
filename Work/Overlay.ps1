@@ -25,7 +25,7 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
                    Foreground="White"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   Margin="0,-150,0,0"/>
+                   Margin="0,-200,0,0"/>
 				   
 		<TextBlock Name="BottomText"
                    Text="t.me/martyfiles | youtube.com/martyfiles | github.com/martyfiles"
