@@ -138,6 +138,7 @@ Rem Если есть DK
 
 	start /b "" Helper /Overlay "Отключение лишнего в Планировщике задач... `n`n [6/13]" /Font "Impact" /Size "40"
 	timeout /t 3 /nobreak >nul 2>&1
+	chcp 866 >nul
 for %%T in (
     "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)" "\Microsoft\Windows\AppID\EDP Policy Manager" "\Microsoft\Windows\AppID\PolicyConverter"
     "\Microsoft\Windows\Application Experience\MareBackup" "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp"
@@ -178,9 +179,9 @@ for %%T in (
     "\Microsoft\Windows\Workplace Join\Automatic-Device-Join" "\Microsoft\Windows\Workplace Join\Device-Sync" "\Microsoft\Windows\Workplace Join\Recovery-Check" "\Microsoft\Windows\UNP\RunCampaignManager" "\MicrosoftEdgeUpdateTaskMachineCore"
     "\MicrosoftEdgeUpdateTaskMachineUA" "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" "\Microsoft\Windows\Windows Defender Cleanup" "\Microsoft\Windows\Windows Defender Scheduled Scan" "\Microsoft\Windows\Windows Defender Verification"
 ) do (
-    schtasks /Change /TN %%T %TaskParam% >nul 2>&1
+    schtasks /Change /TN %%T /Disable >nul 2>&1
 )
-
+	chcp 65001 >nul & exit /b
 
 	start /b "" Helper /Overlay "Оптимизация параметров `n`n [7/13]" /Font "Impact" /Size "40"
 Rem Отключение гибернации
