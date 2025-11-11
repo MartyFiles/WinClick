@@ -463,6 +463,7 @@ Rem Сжатие файлов
 	timeout /t 4 /nobreak >nul 2>&1
 Rem Перезагрузка
 	shutdown /r /t 2
+	Helper /Overlay
 	Exit
 
 Rem Проверка версии Windows
