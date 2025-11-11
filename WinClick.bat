@@ -3,32 +3,31 @@
 	Title WinClick by MartyFiles
 Rem https://t.me/martyfiles
 	Color 0f
-	chcp 866 >nul
+	Mode 20,1
+	chcp 65001 >nul
 	echo "%~dp0\Work" | findstr /r "[()!]" >nul && echo Путь до .bat содержит недопустимые символы. && timeout /t 7 >nul && exit
 	SetLocal EnableDelayedExpansion
 	cd /d "%~dp0\Work"
-	reg query "HKU\S-1-5-19" >nul 2>&1 || nircmd elevate "%~f0" && exit
+	reg query "HKU\S-1-5-19" >nul 2>&1 || (Helper /Elevate "%~f0" && exit || %ch% {red} Права не выданы.{\n#}&& pause>nul && exit)
 
 Rem Установка переменных
 	set "TI=NSudoLG -U:T -P:E -ShowWindowMode:Hide -Wait cmd.exe /c"
-	mode 55,10 >nul
-	nircmd win min ititle "WinClick by MartyFiles"
-	nircmd win hide etitle "WinClick by MartyFiles"
-	set msgFile=%~dp0Work\message.txt
 	
-Rem Фикс, если запущено из Terminal UWP
-	tasklist /fi "imagename eq WindowsTerminal.exe" 2>nul | find /i "WindowsTerminal" >nul && (
-		for %%p in (DelegationConsole DelegationTerminal) do reg add "HKCU\Console\%%%%Startup" /v "%%p" /t REG_SZ /d "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" /f >nul
-		echo. && echo  Restarting with cmd .. && timeout /t 3 /nobreak >nul && start "" "%~f0" && exit
-	)
+REM Принудительный запуск в CMD
+	reg query "HKCU\Console\%%%%Startup" /v DelegationConsole | find /i "B23D10C0" >nul 2>&1 || (
+	tasklist /fi "imagename eq WindowsTerminal.exe" 2>nul | find /i "WindowsTerminal" >nul 2>&1 && (
+	for %%p in (DelegationConsole DelegationTerminal) do reg add "HKCU\Console\%%%%Startup" /v "%%p" /t reg_sz /d "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" /f >nul 2>&1
+	start "" "%~f0" && exit
+))
 
-Rem Проверка версии
+
+Rem Скрытие консоли и проверка версии
 	call :WinVer && exit /b
-	start "" PowerShell -WindowStyle Hidden -ExecutionPolicy Bypass -NoProfile -NoExit -File "%~dp0Work\Overlay.ps1"
-	echo Скоро Windows 11 станет лучше > "%msgFile%"
-	timeout /t 4 /nobreak >nul 2>&1
-
-echo Удаление мусора... [1/12]  > "%msgFile%"
+	start /b "" Helper /Overlay "Скоро ваша Windows 11 станет лучше" /Font "Impact" /Size "40"
+	Helper /HideConsole
+	timeout /t 3 /nobreak >nul 2>&1
+	
+	start /b "" Helper /Overlay "Удаление мусора `n`n [1/13]" /Font "Impact" /Size "40"
 	sc query wuauserv | find /i "RUNNING" >nul 2>&1 && (
 		net stop wuauserv >nul 2>&1
 		timeout /t 1 /nobreak >nul 2>&1
@@ -56,9 +55,11 @@ Rem Удаление кэша Проводника
 Rem Очистка WinSxS
 	Dism /online /Cleanup-Image /StartComponentCleanup /ResetBase >nul 2>&1
 Rem Удаление лишних папок на диске С
-	for %%F in ("%SystemDrive%\Windows.old" "%SystemDrive%\PerfLogs" "%SystemDrive%\inetpub") do rd /q /s %%F
+	for %%F in ("%SystemDrive%\Windows.old" "%SystemDrive%\PerfLogs" "%SystemDrive%\inetpub") do %TI% rd /q /s %%F
 Rem Удаления старых драйверов
+chcp 866 >nul 
 PowerShell -encodedCommand JABkAGkAcwBtAE8AdQB0ACAAPQAgAGQAaQBzAG0AIAAvAG8AbgBsAGkAbgBlACAALwBnAGUAdAAtAGQAcgBpAHYAZQByAHMADQAKACQATABpAG4AZQBzACAAPQAgACQAZABpAHMAbQBPAHUAdAAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEAMAANAAoAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAiAHQAaABlAE4AYQBtAGUAIgANAAoAJABEAHIAaQB2AGUAcgBzACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQATABpAG4AZQAgAGkAbgAgACQATABpAG4AZQBzACAAKQAgAHsADQAKACAAIAAgACAAJAB0AG0AcAAgAD0AIAAkAEwAaQBuAGUADQAKACAAIAAgACAAJAB0AHgAdAAgAD0AIAAkACgAJAB0AG0AcAAuAFMAcABsAGkAdAAoACAAJwA6ACcAIAApACkAWwAxAF0ADQAKACAAIAAgACAAcwB3AGkAdABjAGgAIAAoACQATwBwAGUAcgBhAHQAaQBvAG4AKQAgAHsADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AYQBtAGUAJwAgAHsAIAAkAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEYAaQBsAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARgBpAGwAZQBOAGEAbQBlACcAIAB7ACAAJABGAGkAbABlAE4AYQBtAGUAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBFAG4AdAByACcADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARQBuAHQAcgAnACAAewAgACQARQBuAHQAcgAgAD0AIAAkAHQAeAB0AC4AVAByAGkAbQAoACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBDAGwAYQBzAHMATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUAQwBsAGEAcwBzAE4AYQBtAGUAJwAgAHsAIAAkAEMAbABhAHMAcwBOAGEAbQBlACAAPQAgACQAdAB4AHQALgBUAHIAaQBtACgAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQATwBwAGUAcgBhAHQAaQBvAG4AIAA9ACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAJwB0AGgAZQBWAGUAbgBkAG8AcgAnACAAewAgACQAVgBlAG4AZABvAHIAIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAEQAYQB0AGUAJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACcAdABoAGUARABhAHQAZQAnACAAewAgACAAJAB0AG0AcAAgAD0AIAAkAHQAeAB0AC4AcwBwAGwAaQB0ACgAIAAnAC4AJwAgACkADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAdAB4AHQAIAA9ACAAIgAkACgAJAB0AG0AcABbADIAXQApAC4AJAAoACQAdABtAHAAWwAxAF0AKQAuACQAKAAkAHQAbQBwAFsAMABdAC4AVAByAGkAbQAoACkAKQAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAEQAYQB0AGUAIAA9ACAAJAB0AHgAdAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABPAHAAZQByAGEAdABpAG8AbgAgAD0AIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAYgByAGUAYQBrAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAnAHQAaABlAFYAZQByAHMAaQBvAG4AJwAgAHsAIAAkAFYAZQByAHMAaQBvAG4AIAA9ACAAJAB0AHgAdAAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgB1AGwAbAAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAHAAYQByAGEAbQBzACAAPQAgAFsAbwByAGQAZQByAGUAZABdAEAAewAgACcARgBpAGwAZQBOAGEAbQBlACcAIAA9ACAAJABGAGkAbABlAE4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBWAGUAbgBkAG8AcgAnACAAPQAgACQAVgBlAG4AZABvAHIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBEAGEAdABlACcAIAA9ACAAJABEAGEAdABlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACcATgBhAG0AZQAnACAAPQAgACQATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAEMAbABhAHMAcwBOAGEAbQBlACcAIAA9ACAAJABDAGwAYQBzAHMATgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAnAFYAZQByAHMAaQBvAG4AJwAgAD0AIAAkAFYAZQByAHMAaQBvAG4ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJwBFAG4AdAByACcAIAA9ACAAJABFAG4AdAByAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABvAGIAagAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBUAHkAcABlAE4AYQBtAGUAIABQAFMATwBiAGoAZQBjAHQAIAAtAFAAcgBvAHAAZQByAHQAeQAgACQAcABhAHIAYQBtAHMADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQARAByAGkAdgBlAHIAcwAgACsAPQAgACQAbwBiAGoADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgACAAIAAgACAAIAAnAHQAaABlAE4AdQBsAGwAJwAgAHsAIAAkAE8AcABlAHIAYQB0AGkAbwBuACAAPQAgACcAdABoAGUATgBhAG0AZQAnAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAfQANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAGwAYQBzAHQAIAA9ACAAJwAnAA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJAAoACQARAByAGkAdgBlAHIAcwAgAHwAIABzAG8AcgB0ACAARgBpAGwAZQBuAGEAbQBlACkAIAApACAAewANAAoAIAAgACAAIABpAGYAIAAoACQARAByAC4ARgBpAGwAZQBOAGEAbQBlACAALQBlAHEAIAAkAGwAYQBzAHQAIAAgACkAIAB7ACAAIAAkAE4AbwB0AFUAbgBpAHEAdQBlACAAKwA9ACAAJABEAHIAIAAgAH0ADQAKACAAIAAgACAAJABsAGEAcwB0ACAAPQAgACQARAByAC4ARgBpAGwAZQBOAGEAbQBlAA0ACgB9AA0ACgAkAE4AbwB0AFUAbgBpAHEAdQBlACAAfAAgAHMAbwByAHQAIABGAGkAbABlAE4AYQBtAGUAIAB8ACAAZgB0AA0ACgAjAFMAZQBhAHIAYwBoAGkAbgBnACAAZgBvAHIAIABkAHUAcABsAGkAYwBhAHQAZQAgAGQAcgBpAHYAZQByAHMAIAANAAoAJABsAGkAcwB0ACAAPQAgACQATgBvAHQAVQBuAGkAcQB1AGUAIAB8ACAAcwBlAGwAZQBjAHQAIAAtAEUAeABwAGEAbgBkAFAAcgBvAHAAZQByAHQAeQAgAEYAaQBsAGUATgBhAG0AZQAgAC0AVQBuAGkAcQB1AGUADQAKACQAVABvAEQAZQBsACAAPQAgAEAAKAApAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAgACQARAByACAAaQBuACAAJABsAGkAcwB0ACAAKQAgAHsADQAKACAAIAAgACAAVwByAGkAdABlAC0ASABvAHMAdAAgACIARAB1AHAAbABpAGMAYQB0AGUAIABkAHIAaQB2AGUAcgAgAGYAbwB1AG4AZAAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgACQAcwBlAGwAIAA9ACAAJABEAHIAaQB2AGUAcgBzACAAfAAgAHcAaABlAHIAZQAgAHsAIAAkAF8ALgBGAGkAbABlAE4AYQBtAGUAIAAtAGUAcQAgACQARAByACAAfQAgAHwAIABzAG8AcgB0ACAAZABhAHQAZQAgAC0ARABlAHMAYwBlAG4AZABpAG4AZwAgAHwAIABzAGUAbABlAGMAdAAgAC0AUwBrAGkAcAAgADEADQAKACAAIAAgACAAJABzAGUAbAAgAHwAIABmAHQADQAKACAAIAAgACAAJABUAG8ARABlAGwAIAArAD0AIAAkAHMAZQBsAA0ACgB9AA0ACgAjAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAEwAaQBzAHQAIABvAGYAIABkAHIAaQB2AGUAcgAgAHYAZQByAHMAaQBvAG4AIAAgAHQAbwAgAHIAZQBtAG8AdgBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAUgBlAGQADQAKACQAVABvAEQAZQBsACAAfAAgAGYAdAANAAoAIwBEAGUAbABlAHQAaQBuAGcAIABvAGwAZAAgAGQAcgBpAHYAZQByAHMADQAKAGYAbwByAGUAYQBjAGgAIAAoACAAJABpAHQAZQBtACAAaQBuACAAJABUAG8ARABlAGwAIAApACAAewANAAoAIAAgACAAIAAkAE4AYQBtAGUAIAA9ACAAJAAoACQAaQB0AGUAbQAuAE4AYQBtAGUAKQAuAFQAcgBpAG0AKAApAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAGQAZQBsAGUAdABpAG4AZwAgACQATgBhAG0AZQAiACAALQBGAG8AcgBlAGcAcgBvAHUAbgBkAEMAbwBsAG8AcgAgAFkAZQBsAGwAbwB3AA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAiAHAAbgBwAHUAdABpAGwALgBlAHgAZQAgAC8AZABlAGwAZQB0AGUALQBkAHIAaQB2AGUAcgAgACAAJABOAGEAbQBlACIAIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAWQBlAGwAbABvAHcADQAKACAAIAAgACAASQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuACAALQBDAG8AbQBtAGEAbgBkACAAIgBwAG4AcAB1AHQAaQBsAC4AZQB4AGUAIAAvAGQAZQBsAGUAdABlAC0AZAByAGkAdgBlAHIAIAAkAE4AYQBtAGUAIgANAAoAfQA= >nul 2>&1
+chcp 65001 >nul
 Rem Удаление ShellBags
 for %%k in (Bags BagMRU BagsMRU) do (
     reg delete "HKCU\Software\Microsoft\Windows\Shell\%%k" /f >nul 2>&1
@@ -66,17 +67,16 @@ for %%k in (Bags BagMRU BagsMRU) do (
     reg delete "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\%%k" /f >nul 2>&1
 )
 
-
-echo Удаление всех UWP-приложений... [2/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Удаление всех предустановленных приложений `n`n[2/13]" /Font "Impact" /Size "40"
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false } | ForEach-Object { Remove-AppxPackage -Package $_.PackageFullName -AllUsers -ErrorAction SilentlyContinue }" >nul 2>&1
 	reg add "HKLM\Software\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d "0" /f >nul 2>&1
 Rem Удаление OneDrive
 	taskkill /f /im OneDrive.exe >nul 2>&1
 	%SystemRoot%\System32\OneDriveSetup.exe /uninstall >nul 2>&1
-	%TI% del "%SystemRoot%\System32\OneDriveSetup.exe" >nul 2>&1
-	%TI% rd "%UserProfile%\OneDrive" /Q /S >nul 2>&1
-	%TI% rd "%ProgramData%\Microsoft OneDrive" /Q /S >nul 2>&1
-	%TI% rd "%LocalAppData%\Microsoft\OneDrive" /Q /S >nul 2>&1
+	for %%P in ("%LocalAppData%\OneDrive" "%ProgramData%\Microsoft OneDrive" "%UserProfile%\OneDrive" "%LocalAppData%\Microsoft\OneDrive") do rd /s /q "%%P" >nul 2>&1
+	for /d %%i in ("%SystemRoot%\WinSxS\amd64_microsoft-windows-onedrive-setup*") do %TI% rd /s /q "%%i"
+	for %%F in ("OneDriveSetup.exe" "OneDrive.ico") do %TI% del /q "%SystemRoot%\System32\%%F"
+	if exist "%SystemRoot%\WinSxS\amd64_microsoft-windows-onedrive-setup*" for /d %%i in ("%SystemRoot%\WinSxS\amd64_microsoft-windows-onedrive-setup*") do %TI% rd /s /q "%%i"
 	reg delete "HKCU\Software\Microsoft\OneDrive" /f >nul 2>&1
 	reg delete "HKLM\Software\Microsoft\OneDrive" /f >nul 2>&1
 Rem Удаление лишних папок с приложениями в Пуске
@@ -87,202 +87,102 @@ Rem Удаление Помощника по удаленному подключ
 	timeout /t 5 /nobreak >nul 2>&1
 	taskkill /f /im mstsc.exe >nul 2>&1
 
-
-echo Удаление браузера Edge... [3/12] > "%msgFile%"
-	taskkill /f /im MicrosoftEdge.exe >nul 2>&1
-	taskkill /f /im MicrosoftEdgeUpdate.exe >nul 2>&1
+	start /b "" Helper /Overlay "Удаление браузера Edge и WebView2 `n`n [3/13]" /Font "Impact" /Size "40"
+	%TI% taskkill /f /im MicrosoftEdge.exe >nul 2>&1
+	%TI% taskkill /f /im MicrosoftEdgeUpdate.exe >nul 2>&1
 	start /wait "" "%~dp0\Work\setup.exe" --uninstall --system-level --force-uninstall --msedge >nul 2>&1
 	start /wait "" "%~dp0\Work\setup.exe" --uninstall --system-level --force-uninstall --msedgewebview >nul 2>&1
+	
+	
+	start /b "" Helper /Overlay "Удаление Защитника Windows `n`n [4/13]" /Font "Impact" /Size "40"
+	timeout /t 4 /nobreak >nul 2>&1
+Rem Если есть DK
+	if exist "%USERPROFILE%\Desktop\DK\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DK\DefenderKiller.bat" || if exist "%USERPROFILE%\Desktop\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DefenderKiller.bat" || if exist "%USERPROFILE%\Desktop\DefenderKiller\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%
 
-echo Удаление дополнительных компонентов... [4/12] > "%msgFile%"
-for %%C in (
-    Microsoft.Windows.Notepad.System
-	Microsoft.Windows.PowerShell.ISE
-	Print.Management.Console
-    VBSCRIPT
-    OpenSSH.Client
-    Hello.Face
-    MathRecognizer
-    InternetExplorer
-    StepsRecorder
-    Media.WindowsMediaPlayer
-	Microsoft.Wallpapers.Extended
-) do (
-    for /f "tokens=2 delims=:" %%A in ('dism /Online /Get-Capabilities ^| findstr /I "%%C"') do (
-        set "cap=%%A"
-        set "cap=!cap:~1!"
-        dism /Online /Remove-Capability /CapabilityName:!cap! /NoRestart
-    )
-) >nul 2>&1
+	if defined DK (
+		start /b "" Helper /Overlay
+		start /wait "" "!DK!" /DelWD
 
+		:check
+		reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\WINEVT\Channels\Microsoft-Windows-Windows Defender/Operational" >nul 2>&1 && (
+			timeout /t 10 >nul
+			goto check
+		)
+	) 
 
-echo Отключение лишнего в Планировщике задач... [5/12] > "%msgFile%"
-timeout /t 3 /nobreak >nul 2>&1
+	if not defined DK (
+		start /b "" Helper /Overlay "DefenderKiller не обнаружен `n`nПропускаю..." /Font "Impact" /Size "40"
+		timeout /t 4 >nul
+	)
+
+	start /b "" Helper /Overlay "Удаление дополнительных компонентов `n`n [5/13]" /Font "Impact" /Size "40"
+	for %%C in (
+		Microsoft.Windows.Notepad.System
+		Microsoft.Windows.PowerShell.ISE
+		Print.Management.Console
+		VBSCRIPT
+		OpenSSH.Client
+		Hello.Face
+		MathRecognizer
+		InternetExplorer
+		StepsRecorder
+		Media.WindowsMediaPlayer
+		Microsoft.Wallpapers.Extended
+	) do (
+		for /f "tokens=2 delims=:" %%A in ('dism /Online /Get-Capabilities ^| findstr /I "%%C"') do (
+			set "cap=%%A"
+			set "cap=!cap:~1!"
+			dism /Online /Remove-Capability /CapabilityName:!cap! /NoRestart
+		)
+	) >nul 2>&1
+
+	start /b "" Helper /Overlay "Отключение лишнего в Планировщике задач... `n`n [6/13]" /Font "Impact" /Size "40"
+	timeout /t 3 /nobreak >nul 2>&1
 for %%T in (
-    "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)"
-    "\Microsoft\Windows\AppID\EDP Policy Manager"
-    "\Microsoft\Windows\AppID\PolicyConverter"
-    "\Microsoft\Windows\Application Experience\MareBackup"
-    "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
-    "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp"
-    "\Microsoft\Windows\Application Experience\PcaPatchDbTask"
-    "\Microsoft\Windows\Application Experience\SdbinstMergeDbTask"
-    "\Microsoft\Windows\Application Experience\StartupAppTask"
-    "\Microsoft\Windows\Application Experience\ProgramDataUpdater"
-    "\Microsoft\Windows\Application Experience\ProgramInventoryUpdater"
-    "\Microsoft\Windows\ApplicationData\appuriverifierdaily"
-    "\Microsoft\Windows\ApplicationData\appuriverifierinstall"
-    "\Microsoft\Windows\ApplicationData\DsSvcCleanup"
-    "\Microsoft\Windows\AppxDeploymentClient\Pre-staged app cleanup"
-    "\Microsoft\Windows\AppxDeploymentClient\UCPD velocity"
-    "\Microsoft\Windows\Autochk\Proxy"
-    "\Microsoft\Windows\AutoLogger\AutoLogger-Diagtrack-Listener"
-    "\Microsoft\Windows\AutoLogger\AutoLogger-FileSizeTracking"
-    "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask"
-    "\Microsoft\Windows\CEIP\Uploader"
-    "\Microsoft\Windows\CertificateServicesClient\AikCertEnrollTask"
-    "\Microsoft\Windows\CertificateServicesClient\CryptoPolicyTask"
-    "\Microsoft\Windows\CertificateServicesClient\KeyPreGenTask"
-    "\Microsoft\Windows\CertificateServicesClient\SystemTask"
-    "\Microsoft\Windows\Cleanup\UpdateCleanup"
-    "\Microsoft\Windows\Clip\License Validation"
-    "\Microsoft\Windows\Clip\LicenseImdsIntegration"
-    "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask"
-    "\Microsoft\Windows\CloudExperienceHost\SyncHost"
-    "\Microsoft\Windows\CloudRestore\Backup"
-    "\Microsoft\Windows\CloudRestore\Restore"
-    "\Microsoft\Windows\ContactSupport\Scheduled"
-    "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator"
-    "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask"
-    "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip"
-    "\Microsoft\Windows\Customer Experience Improvement Program\BthSQM"
-    "\Microsoft\Windows\Customer Experience Improvement Program\Uploader"
-    "\Microsoft\Windows\Device Information\Device"
-    "\Microsoft\Windows\Device Information\Device User"
-    "\Microsoft\Windows\Device Setup\Driver Recovery on Reboot"
-    "\Microsoft\Windows\Device Setup\Metadata Refresh"
-    "\Microsoft\Windows\DeviceDirectoryClient\HandleCommand"
-    "\Microsoft\Windows\DeviceDirectoryClient\HandleWnsCommand"
-    "\Microsoft\Windows\DeviceDirectoryClient\IntegrityCheck"
-    "\Microsoft\Windows\DeviceDirectoryClient\LocateCommandUserSession"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceAccountChange"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceLocationRightsChange"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePeriodic24"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePolicyChange"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceProtectionStateChanged"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceSettingChange"
-    "\Microsoft\Windows\DeviceDirectoryClient\RegisterUserDevice"
-    "\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
-    "\Microsoft\Windows\Diagnosis\Scheduled"
-    "\Microsoft\Windows\Diagnosis\UnexpectedCodepath"
-    "\Microsoft\Windows\DiskCleanup\SilentCleanup"
-    "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector"
-    "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticResolver"
-    "\Microsoft\Windows\DiskDiagnostic\DiagnosticResolver"
-    "\Microsoft\Windows\DiskDiagnostic\DiskDiagnostic"
-    "\Microsoft\Windows\DiskFootprint\Diagnostics"
-    "\Microsoft\Windows\DiskFootprint\StorageSense"
-    "\Microsoft\Windows\DUSM\dusmtask"
-    "\Microsoft\Windows\ErrorReporting\QueueReporting"
-    "\Microsoft\Windows\ErrorReporting\KernelCeipTask"
-    "\Microsoft\Windows\ExploitGuard\ExploitGuard MDM policy Refresh"
-    "\Microsoft\Windows\Feedback\Siuf\DmClient"
-    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"
-    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioUpload"
-    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioRun"
-    "\Microsoft\Windows\Feedback\Siuf\DmClientOnUserSignIn"
-    "\Microsoft\Windows\File Classification Infrastructure\Property Definition Sync"
-    "\Microsoft\Windows\FileHistory\File History (maintenance mode)"
-    "\Microsoft\Windows\Help\OEMSupport"
-    "\Microsoft\Windows\Help\WindowsHelpUpdateTask"
-    "\Microsoft\Windows\HelloFace\FODCleanupTask"
-    "\Microsoft\Windows\HelloFace\FeatureCleanup"
-    "\Microsoft\Windows\input\InputSettingsRestoreDataAvailable"
-    "\Microsoft\Windows\input\LocalUserSyncDataAvailable"
-    "\Microsoft\Windows\input\MouseSyncDataAvailable"
-    "\Microsoft\Windows\input\PenSyncDataAvailable"
-    "\Microsoft\Windows\input\RemoteMouseSyncDataAvailable"
-    "\Microsoft\Windows\input\RemotePenSyncDataAvailable"
-    "\Microsoft\Windows\input\RemoteTouchpadSyncDataAvailable"
-    "\Microsoft\Windows\input\TouchpadSyncDataAvailable"
-    "\Microsoft\Windows\InstallService\WakeUpAndContinueUpdates"
-    "\Microsoft\Windows\InstallService\WakeUpAndScanForUpdates"
-    "\Microsoft\Windows\International\Synchronize Language Settings"
-    "\Microsoft\Windows\LanguageComponentsInstaller\Installation"
-    "\Microsoft\Windows\LanguageComponentsInstaller\ReconcileLanguageResources"
-    "\Microsoft\Windows\LanguageComponentsInstaller\Uninstallation"
-    "\Microsoft\Windows\License Manager\TempSignedLicenseExchange"
-    "\Microsoft\Windows\Location\WindowsActionDialog"
-    "\Microsoft\Windows\Maintenance\WinSAT"
-    "\Microsoft\Windows\Maps\MapsToastTask"
-    "\Microsoft\Windows\Maps\MapsUpdateTask"
-    "\Microsoft\Windows\MemoryDiagnostic\AutomaticOfflineMemoryDiagnostic"
-    "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic"
-    "\Microsoft\Windows\NlaSvc\WiFiTask"
-    "\Microsoft\Windows\Offline Files\Background Synchronization"
-    "\Microsoft\Windows\Offline Files\Logon Synchronization"
-    "\Microsoft\Windows\PCRPF\PCR Prediction Framework Firmware Update Task"
-    "\Microsoft\Windows\PerformanceTrace\WhesvcToast"
-    "\Microsoft\Windows\PI\Secure-Boot-Update"
-    "\Microsoft\Windows\PI\Sqm-Tasks"
-    "\Microsoft\Windows\Pluton\Pluton-Ksp-Provisioning"
-    "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem"
-    "\Microsoft\Windows\Printing\EduPrintProv"
-    "\Microsoft\Windows\Printing\PrintJobCleanupTask"
-    "\Microsoft\Windows\PushToInstall\LoginCheck"
-    "\Microsoft\Windows\PushToInstall\Registration"
-    "\Microsoft\Windows\Ras\MobilityManager"
-    "\Microsoft\Windows\ReFsDedupSvc\Initialization"
-    "\Microsoft\Windows\Registry\RegIdleBackup"
-    "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask"
-    "\Microsoft\Windows\RetailDemo\CleanupOfflineContent"
-    "\Microsoft\Windows\Search\IndexerDiagnosticsTask"
-    "\Microsoft\Windows\Search\SearchIndexerMaintenance"
-    "\Microsoft\Windows\Setup\SetupCleanupTask"
-    "\Microsoft\Windows\SharedPC\Account Cleanup"
-    "\Microsoft\Windows\Shell\FamilySafetyMonitor"
-    "\Microsoft\Windows\Shell\FamilySafetyRefreshTask"
-    "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance"
-    "\Microsoft\Windows\Shell\ThemeAssetTask_SyncFODState"
-    "\Microsoft\Windows\Shell\ThemesSyncedImageDownload"
-    "\Microsoft\Windows\Shell\UndockedFlightingUpdate"
-    "\Microsoft\Windows\Shell\UpdateUserPictureTask"
-    "\Microsoft\Windows\Storage Tiers Management\Storage Tiers Optimization"
-    "\Microsoft\Windows\Subscription\EnableLicenseAcquisition"
-    "\Microsoft\Windows\Subscription\LicenseAcquisition"
-    "\Microsoft\Windows\Sysmain\WsSwapAssessmentTask"
-    "\Microsoft\Windows\Sysmain\HybridDriveCacheRebalance"
-    "\Microsoft\Windows\Sysmain\HybridDriveCachePrepopulate"
-    "\Microsoft\Windows\UPnP\UPnPHostConfig"
-    "\Microsoft\Windows\UpdateOrchestrator\CleanupUpdateTask"
-    "\Microsoft\Windows\User Profile Service\HiveUploadTask"
-    "\Microsoft\Windows\WaaSMedic\PerformRemediation"
-    "\Microsoft\Windows\WaaSMedic\ScanForUpdates"
-    "\Microsoft\Windows\WaaSMedic\WsusScan"
-    "\Microsoft\Windows\Windows Error Reporting\QueueReporting"
-    "\Microsoft\Windows\Windows Error Reporting\ReportQueue"
-    "\Microsoft\Windows\Windows Filtering Platform\BfeOnServiceStartTypeChange"
-    "\Microsoft\Windows\WindowsAI\Recall\InitialConfiguration"
-    "\Microsoft\Windows\WindowsAI\Recall\PolicyConfiguration"
-    "\Microsoft\Windows\WindowsAI\Settings\InitialConfiguration"
-    "\Microsoft\Windows\WindowsAI\Copilot\CopilotDataCollectionTask"
-    "\Microsoft\Windows\WindowsAI\Insights\InsightsDataCollectionTask"
-    "\Microsoft\Windows\WindowsUpdate\Refresh Group Policy Cache"
-    "\Microsoft\Windows\WlanSvc\CDSSync"
-    "\Microsoft\Windows\WOF\WIM-Hash-Management"
-    "\Microsoft\Windows\WOF\WIM-Hash-Validation"
-    "\Microsoft\Windows\Workplace Join\Automatic-Device-Join"
-    "\Microsoft\Windows\Workplace Join\Device-Sync"
-    "\Microsoft\Windows\Workplace Join\Recovery-Check"
-    "\Microsoft\Windows\UNP\RunCampaignManager"
-    "\MicrosoftEdgeUpdateTaskMachineCore"
-    "\MicrosoftEdgeUpdateTaskMachineUA"
+    "\Microsoft\Windows\Active Directory Rights Management Services Client\AD RMS Rights Policy Template Management (Automated)" "\Microsoft\Windows\AppID\EDP Policy Manager" "\Microsoft\Windows\AppID\PolicyConverter"
+    "\Microsoft\Windows\Application Experience\MareBackup" "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp"
+    "\Microsoft\Windows\Application Experience\PcaPatchDbTask" "\Microsoft\Windows\Application Experience\SdbinstMergeDbTask" "\Microsoft\Windows\Application Experience\StartupAppTask"
+    "\Microsoft\Windows\Application Experience\ProgramDataUpdater" "\Microsoft\Windows\Application Experience\ProgramInventoryUpdater" "\Microsoft\Windows\ApplicationData\appuriverifierdaily"
+    "\Microsoft\Windows\ApplicationData\appuriverifierinstall" "\Microsoft\Windows\ApplicationData\DsSvcCleanup" "\Microsoft\Windows\AppxDeploymentClient\Pre-staged app cleanup"
+    "\Microsoft\Windows\AppxDeploymentClient\UCPD velocity" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\AutoLogger\AutoLogger-Diagtrack-Listener" "\Microsoft\Windows\AutoLogger\AutoLogger-FileSizeTracking"
+    "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask" "\Microsoft\Windows\CEIP\Uploader" "\Microsoft\Windows\CertificateServicesClient\AikCertEnrollTask" "\Microsoft\Windows\CertificateServicesClient\CryptoPolicyTask"
+	"\Microsoft\Windows\CertificateServicesClient\KeyPreGenTask" "\Microsoft\Windows\CertificateServicesClient\SystemTask" "\Microsoft\Windows\Cleanup\UpdateCleanup" "\Microsoft\Windows\Clip\License Validation" "\Microsoft\Windows\Clip\LicenseImdsIntegration"
+    "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\CloudExperienceHost\SyncHost" "\Microsoft\Windows\CloudRestore\Backup" "\Microsoft\Windows\CloudRestore\Restore" "\Microsoft\Windows\ContactSupport\Scheduled"
+    "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask" "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip"
+    "\Microsoft\Windows\Customer Experience Improvement Program\BthSQM" "\Microsoft\Windows\Customer Experience Improvement Program\Uploader" "\Microsoft\Windows\Device Information\Device" "\Microsoft\Windows\Device Information\Device User"
+	"\Microsoft\Windows\Device Setup\Driver Recovery on Reboot" "\Microsoft\Windows\Device Setup\Metadata Refresh" "\Microsoft\Windows\DeviceDirectoryClient\HandleCommand" "\Microsoft\Windows\DeviceDirectoryClient\HandleWnsCommand"
+    "\Microsoft\Windows\DeviceDirectoryClient\IntegrityCheck" "\Microsoft\Windows\DeviceDirectoryClient\LocateCommandUserSession" "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceAccountChange" "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceLocationRightsChange"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePeriodic24" "\Microsoft\Windows\DeviceDirectoryClient\RegisterDevicePolicyChange" "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceProtectionStateChanged"
+    "\Microsoft\Windows\DeviceDirectoryClient\RegisterDeviceSettingChange" "\Microsoft\Windows\DeviceDirectoryClient\RegisterUserDevice" "\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner" "\Microsoft\Windows\Diagnosis\Scheduled"
+    "\Microsoft\Windows\Diagnosis\UnexpectedCodepath" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticResolver"
+    "\Microsoft\Windows\DiskDiagnostic\DiagnosticResolver" "\Microsoft\Windows\DiskDiagnostic\DiskDiagnostic" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\DiskFootprint\StorageSense" "\Microsoft\Windows\DUSM\dusmtask" "\Microsoft\Windows\ErrorReporting\QueueReporting"
+    "\Microsoft\Windows\ErrorReporting\KernelCeipTask" "\Microsoft\Windows\ExploitGuard\ExploitGuard MDM policy Refresh" "\Microsoft\Windows\Feedback\Siuf\DmClient" "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioUpload"
+    "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioRun" "\Microsoft\Windows\Feedback\Siuf\DmClientOnUserSignIn" "\Microsoft\Windows\File Classification Infrastructure\Property Definition Sync" "\Microsoft\Windows\FileHistory\File History (maintenance mode)"
+    "\Microsoft\Windows\Help\OEMSupport" "\Microsoft\Windows\Help\WindowsHelpUpdateTask" "\Microsoft\Windows\HelloFace\FODCleanupTask" "\Microsoft\Windows\HelloFace\FeatureCleanup" "\Microsoft\Windows\input\InputSettingsRestoreDataAvailable"
+    "\Microsoft\Windows\input\LocalUserSyncDataAvailable" "\Microsoft\Windows\input\MouseSyncDataAvailable" "\Microsoft\Windows\input\PenSyncDataAvailable" "\Microsoft\Windows\input\RemoteMouseSyncDataAvailable" "\Microsoft\Windows\input\RemotePenSyncDataAvailable"
+    "\Microsoft\Windows\input\RemoteTouchpadSyncDataAvailable" "\Microsoft\Windows\input\TouchpadSyncDataAvailable" "\Microsoft\Windows\InstallService\WakeUpAndContinueUpdates" "\Microsoft\Windows\InstallService\WakeUpAndScanForUpdates"
+    "\Microsoft\Windows\International\Synchronize Language Settings" "\Microsoft\Windows\LanguageComponentsInstaller\Installation" "\Microsoft\Windows\LanguageComponentsInstaller\ReconcileLanguageResources" "\Microsoft\Windows\LanguageComponentsInstaller\Uninstallation"
+    "\Microsoft\Windows\License Manager\TempSignedLicenseExchange" "\Microsoft\Windows\Location\WindowsActionDialog" "\Microsoft\Windows\Maintenance\WinSAT" "\Microsoft\Windows\Maps\MapsToastTask"
+    "\Microsoft\Windows\Maps\MapsUpdateTask" "\Microsoft\Windows\MemoryDiagnostic\AutomaticOfflineMemoryDiagnostic" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\NlaSvc\WiFiTask"
+    "\Microsoft\Windows\Offline Files\Background Synchronization" "\Microsoft\Windows\Offline Files\Logon Synchronization" "\Microsoft\Windows\PCRPF\PCR Prediction Framework Firmware Update Task" "\Microsoft\Windows\PerformanceTrace\WhesvcToast"
+    "\Microsoft\Windows\PI\Secure-Boot-Update" "\Microsoft\Windows\PI\Sqm-Tasks" "\Microsoft\Windows\Pluton\Pluton-Ksp-Provisioning" "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem" "\Microsoft\Windows\Printing\EduPrintProv"
+    "\Microsoft\Windows\Printing\PrintJobCleanupTask" "\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\PushToInstall\Registration" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\ReFsDedupSvc\Initialization"
+    "\Microsoft\Windows\Registry\RegIdleBackup" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\Search\IndexerDiagnosticsTask"
+    "\Microsoft\Windows\Search\SearchIndexerMaintenance" "\Microsoft\Windows\Setup\SetupCleanupTask" "\Microsoft\Windows\SharedPC\Account Cleanup" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\Shell\FamilySafetyRefreshTask"
+    "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\Shell\ThemeAssetTask_SyncFODState" "\Microsoft\Windows\Shell\ThemesSyncedImageDownload" "\Microsoft\Windows\Shell\UndockedFlightingUpdate" "\Microsoft\Windows\Shell\UpdateUserPictureTask"
+	"\Microsoft\Windows\Storage Tiers Management\Storage Tiers Optimization" "\Microsoft\Windows\Subscription\EnableLicenseAcquisition" "\Microsoft\Windows\Subscription\LicenseAcquisition" "\Microsoft\Windows\Sysmain\WsSwapAssessmentTask" "\Microsoft\Windows\Sysmain\HybridDriveCacheRebalance"
+    "\Microsoft\Windows\Sysmain\HybridDriveCachePrepopulate" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\UpdateOrchestrator\CleanupUpdateTask" "\Microsoft\Windows\User Profile Service\HiveUploadTask" "\Microsoft\Windows\WaaSMedic\PerformRemediation"
+    "\Microsoft\Windows\WaaSMedic\ScanForUpdates" "\Microsoft\Windows\WaaSMedic\WsusScan" "\Microsoft\Windows\Windows Error Reporting\QueueReporting" "\Microsoft\Windows\Windows Error Reporting\ReportQueue" "\Microsoft\Windows\Windows Filtering Platform\BfeOnServiceStartTypeChange"
+    "\Microsoft\Windows\WindowsAI\Recall\InitialConfiguration" "\Microsoft\Windows\WindowsAI\Recall\PolicyConfiguration" "\Microsoft\Windows\WindowsAI\Settings\InitialConfiguration" "\Microsoft\Windows\WindowsAI\Copilot\CopilotDataCollectionTask"
+    "\Microsoft\Windows\WindowsAI\Insights\InsightsDataCollectionTask" "\Microsoft\Windows\WindowsUpdate\Refresh Group Policy Cache" "\Microsoft\Windows\WlanSvc\CDSSync" "\Microsoft\Windows\WOF\WIM-Hash-Management" "\Microsoft\Windows\WOF\WIM-Hash-Validation"
+    "\Microsoft\Windows\Workplace Join\Automatic-Device-Join" "\Microsoft\Windows\Workplace Join\Device-Sync" "\Microsoft\Windows\Workplace Join\Recovery-Check" "\Microsoft\Windows\UNP\RunCampaignManager" "\MicrosoftEdgeUpdateTaskMachineCore"
+    "\MicrosoftEdgeUpdateTaskMachineUA" "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" "\Microsoft\Windows\Windows Defender Cleanup" "\Microsoft\Windows\Windows Defender Scheduled Scan" "\Microsoft\Windows\Windows Defender Verification"
 ) do (
-    schtasks /Change /TN %%T /Disable >nul 2>&1
+    schtasks /Change /TN %%T %TaskParam% >nul 2>&1
 )
 
 
-echo Оптимизация параметров... [6/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Оптимизация параметров `n`n [7/13]" /Font "Impact" /Size "40"
 Rem Отключение гибернации
     powercfg -h off >nul 2>&1
 	reg add "HKLM\System\CurrentControlSet\Control\Power" /v "HibernateEnabledDefault" /t REG_DWORD /d 0x0 /f >nul 2>&1
@@ -298,7 +198,7 @@ Rem Отложенный запуск автоматических служб
 	)
 Rem Минимизация системных отчетов
 	"%~dp0\Work\Eventlog" >nul 2>&1
-Rem Кэш иконок
+Rem Увеличить кэш иконок
 	reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "MaxCachedIcons" /t REG_SZ /d 4096 /f >nul
 Rem Увеличение порога разделения SVC
     PowerShell "$key = 'HKLM:\SYSTEM\CurrentControlSet\Control'; if (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -ErrorAction SilentlyContinue)) { Write-Output ' Параметра SvcHostSplitThresholdInKB нет, отмена действий'; Pause; Exit } elseif (-not (Get-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB_orig' -ErrorAction SilentlyContinue)) { Rename-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -NewName 'SvcHostSplitThresholdInKB_orig'; $mem = (Get-CimInstance Win32_OperatingSystem).TotalVisibleMemorySize + 1024000; Set-ItemProperty -Path $key -Name 'SvcHostSplitThresholdInKB' -Value $mem -Type DWord }
@@ -337,31 +237,22 @@ Rem Отключить VBS
         AuditModeEnabled
         WasEnabledBy
     ) do reg add "HKLM\System\CurrentControlSet\Control\DeviceGuard\Scenarios\KernelShadowStacks" /v "%%p" /t reg_dword /d 0 /f >nul 2>&1
-Rem Отключить DVR 
+Rem Отключить GameDVR 
     reg add "HKCR\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f >nul 
     reg add "HKCR\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
 	reg add "HKLM\Software\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "Value" /t REG_DWORD /d 0 /f >nul
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f >nul
-Rem Максимальная производительность
-	powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul
-	set "skip1=381b4222-f694-41f0-9685-ff5bb260df2e"
-	set "skip2=8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
-	set "skip3=a1841308-3541-4fab-bc81-f71556f20b4a"
-	for /f "tokens=4" %%a in ('powercfg /l') do (
-    if /i not "%%a"=="%skip1%" if /i not "%%a"=="%skip2%" if /i not "%%a"=="%skip3%" (
-        powercfg /setactive %%a >nul
-		)
-	)
+Rem Схема питания Максимальная производительность
+	%TI% reg add "HKLM\System\CurrentControlSet\Control\Power\User\PowerSchemes" /v ActivePowerScheme /t REG_SZ /d e9a42b02-d5df-448d-aa00-03f14749eb61 /f >nul
 Rem Функция Возобновить
 	"%~dp0\Work\vivetool.exe" /disable /id:56517033 >nul
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CrossDeviceResume\Configuration" /v "IsResumeAllowed" /t REG_DWORD /d 0 /f >nul 
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CrossDeviceResume\Configuration" /v "IsOneDriveResumeAllowed" /t REG_DWORD /d 0 /f >nul
 	
-	
-echo Настройка Центра обновления Windows... [7/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Настройка Центра обновления Windows `n`n [8/13]" /Font "Impact" /Size "40"
 	timeout /t 5 /nobreak >nul 2>&1
-Rem Запрет на установку драйверов
+Rem Запрет на установку драйверов из ЦО
 	reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /v "PreventDeviceMetadataFromNetwork" /t REG_DWORD /d "1" /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\Device Metadata" /v "PreventDeviceMetadataFromNetwork" /t REG_DWORD /d "1" /f >nul
 	reg add "HKLM\Software\Policies\Microsoft\Windows\DriverSearching" /v "SearchOrderConfig" /t REG_DWORD /d "0" /f >nul
@@ -385,7 +276,7 @@ Rem Пауза обновлений до 07.07.77
 Rem Запрет автоматических обновлений
 	reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d 1 /f >nul
 
-echo Применение полезных твиков... [8/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Применение полезных твиков `n`n [9/13]" /Font "Impact" /Size "40"
 	timeout /t 3 /nobreak >nul 2>&1
 Rem Отключение UAC
     for %%a in (EnableLUA PromptOnSecureDesktop EnableVirtualization ConsentPromptBehaviorAdmin) do reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "%%a" /t REG_DWORD /d 0 /f >nul
@@ -428,15 +319,14 @@ Rem Отключение рекомендаций в Проводнике
 Rem Отключение других рекомендаций и предложений
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "ContentDeliveryAllowed" /t REG_DWORD /d 0 /f >nul
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t REG_DWORD /d 0 /f >nul
-Rem Установка DNS
+Rem Установка DNS на Wi-Fi адаптеры
 set adapters=Ethernet "Беспроводная сеть" "Бездротова мережа" "Wireless network"
 for %%a in (!adapters!) do (
 	netsh interface ipv4 set dns name=%%a static 1.1.1.1 >nul
 	netsh interface ip add dns name=%%a address=1.0.0.1 index=2 >nul
 )
 
-
-echo Установка драйверов... [9/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Установка драйверов `n`n [10/13]" /Font "Impact" /Size "40"
 	timeout /t 3 /nobreak >nul 2>&1
 Rem Если есть папка Drivers на Рабочем столе
 if exist "%USERPROFILE%\Desktop\Drivers" (
@@ -444,17 +334,17 @@ if exist "%USERPROFILE%\Desktop\Drivers" (
     timeout /t 3 /nobreak >nul 2>&1
 ) else (
 Rem Если нет папки Driver на Рабочем столе
-    echo Папка с драйверами не обнаружена. Пропускаю установку драйверов... > "%msgFile%"
+	start /b "" Helper /Overlay "Папка с драйверами не обнаружена  `n`n Пропускаю..." /Font "Impact" /Size "40"
 	timeout /t 3 /nobreak >nul 2>&1
 )
 
 
-echo Установка Visual C++ и DirectX... [10/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Установка Visual C++ и DirectX `n`n [11/13]" /Font "Impact" /Size "40"
 	start "" /wait "%~dp0\Work\VisualCppRedist_AIO_x86_x64.exe" /aiA /gm2
 	start "" /wait "%~dp0\Work\DirectX.exe"
 	
-
-echo Установка визуальных твиков... [11/12] > "%msgFile%"
+	
+	start /b "" Helper /Overlay "Установка визуальных твиков `n`n [12/13]" /Font "Impact" /Size "40"
     timeout /t 5 /nobreak >nul 2>&1
 Rem Удаление Главная из Проводника 
     reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "HubMode" /t REG_DWORD /d 1 /f >nul
@@ -555,18 +445,21 @@ Rem Показывать расширения файлов
 	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul
 
 
-echo Сжатие системы... [12/12] > "%msgFile%"
+	start /b "" Helper /Overlay "Сжатие системы `n`n [13/13]" /Font "Impact" /Size "40"
 Rem Очистка Центра уведомлений
-	for %%F in (
-		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db"
-		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-shm"
-		"%LocalAppData%\Microsoft\Windows\Notifications\wpndatabase.db-wal"
-	) do %TI% del /q /f /s %%F >nul
+	set "NameSvcMask="
+	for /f "delims=" %%A in (' 2^>nul reg query HKLM\System\CurrentControlSet\Services /k /f WpnUserService_ ^| find "HKEY_"') do set "NameSvcMask=%%~nxA"
+	if defined NameSvcMask (
+	  net stop %NameSvcMask%
+	  del /q /f "%LocalAppData%\Microsoft\Windows\Notifications\*.db*"
+	 timeout /t 1 /nobreak >nul 2>&1
+	  net start %NameSvcMask%
+	) >nul 2>&1
 Rem Сжатие файлов
 	compact /c /s:%SystemDrive%\ /exe:LZX /i /a /f >nul 2>&1
-echo Готово. Перезагружаюсь...> "%msgFile%"
-	timeout /t 5 /nobreak >nul 2>&1
-	del /q /f /s "%~dp0Work\message.txt" >nul 2>&1
+	reg add "HKCU\Software\WinClick" >nul
+	start /b "" Helper /Overlay "Готово. Перезагружаюсь..." /Font "Impact" /Size "40"
+	timeout /t 4 /nobreak >nul 2>&1
 Rem Перезагрузка
 	shutdown /r /t 2
 	Exit
@@ -574,4 +467,5 @@ Rem Перезагрузка
 Rem Проверка версии Windows
 :WinVer
     for /f "skip=2 tokens=3" %%a in ('2^>nul reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber') do set /a build=%%a
-    if !build! LSS 22000 %ch%  {0c}Эта утилита работает только на Windows 11{\n#} && timeout /t 3 /nobreak >nul && exit /b
+    if !build! LSS 22000 start /b "" Helper /Overlay "Утилита предназначена для Windows 11" /Font "Impact" /Size "40" && Helper /HideConsole && timeout /t 4 /nobreak >nul && start /b "" Helper /Overlay && exit /b
+	reg query "HKCU\Software\WinClick" && start /b "" Helper /Overlay "Настройка и оптимизация уже выполнены" /Font "Impact" /Size "40" && Helper /HideConsole && timeout /t 4 /nobreak >nul && start /b "" Helper /Overlay && exit /b
