@@ -97,7 +97,9 @@ Rem Удаление Помощника по удаленному подключ
 	start /b "" Helper /Overlay "Удаление Защитника Windows `n`n [4/13]" /Font "Impact" /Size "40"
 	timeout /t 4 /nobreak >nul 2>&1
 Rem Если есть DK
-	if exist "%USERPROFILE%\Desktop\DK\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DK\DefenderKiller.bat" || if exist "%USERPROFILE%\Desktop\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DefenderKiller.bat" || if exist "%USERPROFILE%\Desktop\DefenderKiller\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%
+	if exist "%USERPROFILE%\Desktop\DK\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DK\DefenderKiller.bat"
+	if exist "%USERPROFILE%\Desktop\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DefenderKiller.bat"
+	if exist "%USERPROFILE%\Desktop\DefenderKiller\DefenderKiller.bat" set "DK=1" & set "DK=%USERPROFILE%\Desktop\DefenderKiller\DefenderKiller.bat"
 
 	if defined DK (
 		start /b "" Helper /Overlay
