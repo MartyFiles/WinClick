@@ -198,7 +198,6 @@ Rem Отключение точек восстановления
 	reg delete "HKLM\Software\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v "RPSessionInterval" /f >nul 2>&1
 Rem Отложенный запуск автоматических служб
 	for %%p in (EventSystem NlaSvc) do reg add "HKLM\System\CurrentControlSet\Services\%%p" /v "DelayedAutostart" /t reg_dword /d 1 /f >nul 2>&1
-	)
 Rem Минимизация системных отчетов
 	"%~dp0\Work\Eventlog" >nul 2>&1
 Rem Увеличить кэш иконок
