@@ -7,7 +7,7 @@
 
 #
 
-[![Видео](https://i.ibb.co/fGdqs6KT/Untitled-2.png)](https://www.youtube.com/watch?v=qmHfwJpnGYA)
+[![Смотреть видео](https://img.youtube.com/vi/qmHfwJpnGYA/maxresdefault.jpg)](https://www.youtube.com/watch?v=qmHfwJpnGYA)
 
 <div align="center">
 
