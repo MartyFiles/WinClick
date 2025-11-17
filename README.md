@@ -7,7 +7,7 @@
 
 #
 
-![WinClick](https://i.ibb.co/JjKjHzp7/Post-copy.png)
+[![Видео](https://i.ibb.co/fGdqs6KT/Untitled-2.png)](https://www.youtube.com/watch?v=qmHfwJpnGYA)
 
 <div align="center">
 
@@ -145,3 +145,27 @@
 ### 💿 13. Сжатие системы
 - Сжатие всех системных и программных файлов самым сильным методом `(LZX)`
 > На слабых ПК может занимать много времени.
+
+#
+
+![Customization](https://i.ibb.co/ksGVSntR/Untitled-1.png)
+
+### 📝 Чтобы настроить WinClick под свои нужды нужно:
+- Скачать и распаковать [актуальный исходный код программы](https://github.com/MartyFiles/WinClick/releases/download/Release/WinClick.zip)
+- Открыть `WinClick.bat` в любом текстовом редакторе
+- Отредактировать команды по своему усмотрению*
+- Сохранить изменения
+- Запустить программу, дважды щелкнув по `WinClick.bat`
+> *например, чтобы убрать сжатие системы, достаточно удалить или закомментировать строки 450 и 461.
+
+#
+
+<div align="center">
+  
+### Донаты
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/martyfiles)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-29ABE0?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/martyfiles)
+[![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/tribute/app?startapp=dg3u)
+
+</div>
