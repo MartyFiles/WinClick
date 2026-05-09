@@ -227,7 +227,6 @@ REM Удаление дополнительных компонентов
 		Microsoft.Windows.Notepad.System
 		Microsoft.Windows.PowerShell.ISE
 		Print.Management.Console
-		VBSCRIPT
 		OpenSSH.Client
 		Hello.Face
 		MathRecognizer
@@ -295,7 +294,6 @@ for %%T in (
 :DisableHibernate
 Rem Отключение гибернации
     powercfg -h off >nul 2>&1
-	reg add "HKLM\System\CurrentControlSet\Control\Power" /v "HibernateEnabledDefault" /t REG_DWORD /d 0x0 /f >nul 2>&1
 	exit /b
 	
 :DisableReservedStorage
@@ -308,7 +306,6 @@ Rem Отключение точек восстановления
 	vssadmin resize shadowstorage /on=c: /for=c: /maxsize=1%% >nul 2>&1
 	PowerShell -Command "Disable-ComputerRestore -Drive '%SystemDrive%\'" >nul 2>&1
 	vssadmin delete shadows /all /quiet >nul 2>&1
-	reg delete "HKLM\Software\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v "RPSessionInterval" /f >nul 2>&1
 	exit /b
 	
 :DelayedServices
